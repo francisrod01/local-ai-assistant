@@ -1,0 +1,58 @@
+services:
+  backend:
+    build: ./backend
+    container_name: local-ai-backend
+    ports:
+      - "8080:8000" # Map host port 8080 to container port 8000
+    environment:
+      - OLLAMA_URL=http://ollama:11434
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: local-ai-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_NO_MMAP=false # enable memory mapping for better performance
+      - OLLAMA_MAX_LOADED_MODELS=1 # limit to 1 model in memory to save RAM
+      - OLLAMA_CONTEXT_LENGTH=512 # shrink KV cache size to save memory
+
+  ollama-init:
+    image: ollama/ollama:latest
+    depends_on:
+      - ollama
+    volumes:
+      - ollama-data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "until ollama list; do
+         echo 'waiting for ollama...';
+         sleep 5;
+       done &&
+       ollama pull phi3:mini &&
+       ollama pull gemma:2b"
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: local-ai-frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173" # match React Router dev server port
+    stdin_open: true
+    tty: true
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+volumes:
+  ollama-data:
