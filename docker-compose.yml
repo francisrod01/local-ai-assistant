@@ -17,10 +17,6 @@ services:
     volumes:
       - ollama-data:/root/.ollama
     restart: unless-stopped
-    environment:
-      - OLLAMA_NO_MMAP=false # enable memory mapping for better performance
-      - OLLAMA_MAX_LOADED_MODELS=1 # limit to 1 model in memory to save RAM
-      - OLLAMA_CONTEXT_LENGTH=512 # shrink KV cache size to save memory
 
   ollama-init:
     image: ollama/ollama:latest
@@ -48,11 +44,8 @@ services:
     working_dir: /app
     volumes:
       - ./frontend:/app
-    ports:
-      - "5173:5173" # match React Router dev server port
     stdin_open: true
     tty: true
-    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
 volumes:
   ollama-data:

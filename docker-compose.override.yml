@@ -1,0 +1,38 @@
+# Development overrides for docker-compose
+# This file is applied on top of docker-compose.yml when running
+# `docker-compose up` (without -f flags).
+
+services:
+  backend:
+    build: ./backend
+    image: local-ai-backend:dev
+    # enable debug mode and mount the source code for live reload
+    environment:
+      - DEBUG=1
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev-env
+    image: local-ai-frontend:dev
+    # run in development mode and mount source tree
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # keep node_modules in container to avoid host/contests conflicts
+    ports:
+      - "5173:5173" # match React Router dev server port
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    expose:
+      - 5173
+
+  ollama:
+    # for development we want conservative memory/worker config
+    restart: unless-stopped
+    environment:
+      - OLLAMA_NO_MMAP=false    # keep memory mapping off to reduce swap usage
+      - OLLAMA_MAX_LOADED_MODELS=1  # load only one model at a time
+      - OLLAMA_CONTEXT_LENGTH=512   # smaller context window saves RAM
