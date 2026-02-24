@@ -2,10 +2,12 @@ services:
   backend:
     build: ./backend
     container_name: local-ai-backend
+    volumes:
+      - ${BACKEND_VOLUME_PATH}:/app/data
     ports:
-      - "8080:8000" # Map host port 8080 to container port 8000
+      - "5000:5000"
     environment:
-      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_URL=${OLLAMA_URL}
     depends_on:
       - ollama
 
@@ -15,15 +17,16 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - ollama-data:/root/.ollama
+      - ${OLLAMA_VOLUME_PATH}:/root/.ollama
     restart: unless-stopped
 
   ollama-init:
     image: ollama/ollama:latest
+    container_name: local-ai-ollama-init
     depends_on:
       - ollama
     volumes:
-      - ollama-data:/root/.ollama
+      - ${OLLAMA_VOLUME_PATH}:/root/.ollama
     environment:
       - OLLAMA_HOST=http://ollama:11434
     entrypoint: ["/bin/sh", "-c"]
@@ -43,9 +46,9 @@ services:
     container_name: local-ai-frontend
     working_dir: /app
     volumes:
-      - ./frontend:/app
+      - ${FRONTEND_VOLUME_PATH}:/usr/src/app/data
+      - /app/node_modules # keep node_modules in container to avoid host/contests conflicts
     stdin_open: true
     tty: true
-
-volumes:
-  ollama-data:
+    depends_on:
+      - backend
