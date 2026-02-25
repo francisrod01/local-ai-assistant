@@ -1,15 +1,15 @@
 services:
-  backend:
-    build: ./backend
-    container_name: local-ai-backend
-    volumes:
-      - ${BACKEND_VOLUME_PATH}:/app/data
-    ports:
-      - "5000:5000"
+  postgres:
+    image: postgres:16
+    container_name: local-ai-postgres
     environment:
-      - OLLAMA_URL=${OLLAMA_URL}
-    depends_on:
-      - ollama
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # use a named volume rather than host bind-mount
+    ports:
+      - "5432:5432"
 
   ollama:
     image: ollama/ollama:latest
@@ -38,6 +38,19 @@ services:
        ollama pull phi3:mini &&
        ollama pull gemma:2b"
 
+  backend:
+    build: ./backend
+    container_name: local-ai-backend
+    volumes:
+      - ${BACKEND_VOLUME_PATH}:/app/data
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=${POSTGRES_URL}
+      - OLLAMA_URL=${OLLAMA_URL}
+    depends_on:
+      - postgres
+      - ollama
 
   frontend:
     build:
@@ -52,3 +65,6 @@ services:
     tty: true
     depends_on:
       - backend
+
+volumes:
+  pgdata:
