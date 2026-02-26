@@ -7,10 +7,47 @@ import ChatInput from "../components/ChatInput";
 import ChatMessage from "../components/ChatMessage";
 import type { Message, Conversation } from "../components/types";
 
+// shape returned from the backend
+type InteractionOut = {
+  id: number;
+  prompt: string;
+  response: string;
+  user: string;
+  created_at: string;
+};
+
 export default function Chat() {
   const [prompt, setPrompt] = useState("");
   const [history, setHistory] = useState<Message[]>([]);
   const [savedConversations, setSavedConversations] = useState<Conversation[]>([]);
+
+  // helper used by multiple pieces of logic
+  const getTitleFromPrompt = (text: string) => text.trim().split(/\s+/).slice(0, 10).join(" ") || "Untitled";
+
+  // load persisted history when component mounts
+  useEffect(() => {
+    async function loadHistory() {
+      try {
+        const res = await fetch("/history");
+        if (!res.ok) throw new Error("failed to fetch history");
+        const data: InteractionOut[] = await res.json();
+        const convs: Conversation[] = data.map((item) => ({
+          id: item.id,
+          title: getTitleFromPrompt(item.prompt),
+          messages: [
+            { role: "user", content: item.prompt },
+            { role: "assistant", content: item.response },
+          ],
+        }));
+        setSavedConversations(convs);
+      } catch (err) {
+        console.error("could not load conversation history", err);
+      }
+    }
+
+    loadHistory();
+  }, []);
+
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
   const [lastSentPrompt, setLastSentPrompt] = useState<string | null>(null);
   const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
@@ -18,13 +55,11 @@ export default function Chat() {
   const { response, loading, error, retryAvailable, sendPrompt, cancelPrompt } = useStreamResponse();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const getTitleFromPrompt = (text: string) => text.trim().split(/\s+/).slice(0, 10).join(" ") || "Untitled";
-
   const handleSend = () => {
     if (!prompt.trim()) return;
 
     const userMsg: Message = { role: "user", content: prompt };
-    setHistory((prev) => [...prev, userMsg]);
+    setHistory((prev: Message[]) => [...prev, userMsg]);
 
     setPendingPrompt(prompt);
     setLastSentPrompt(prompt);
@@ -36,23 +71,46 @@ export default function Chat() {
 
   // When assistant finishes responding, push to history and save a left-side card
   useEffect(() => {
-    if (!loading && response) {
+    if (!loading && response && pendingPrompt) {
       const assistantMsg: Message = { role: "assistant", content: response };
-      setHistory((prev) => [...prev, assistantMsg]);
+      setHistory((prev: Message[]) => [...prev, assistantMsg]);
 
-      if (pendingPrompt) {
-        const title = getTitleFromPrompt(pendingPrompt);
-        const conv: Conversation = {
-          id: Date.now(),
-          title,
-          messages: [
-            { role: "user", content: pendingPrompt },
-            { role: "assistant", content: response },
-          ],
-        };
-        setSavedConversations((prev) => [conv, ...prev]);
-        setPendingPrompt(null);
-      }
+      const title = getTitleFromPrompt(pendingPrompt);
+
+      // save interaction to backend and add to local list once we have an ID
+      (async () => {
+        try {
+          const res = await fetch("/history", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: pendingPrompt, response, user: "user_1" }),
+          });
+          const saved: InteractionOut = await res.json();
+          const conv: Conversation = {
+            id: saved.id,
+            title,
+            messages: [
+              { role: "user", content: pendingPrompt },
+              { role: "assistant", content: response },
+            ],
+          };
+          setSavedConversations((prev: Conversation[]) => [conv, ...prev]);
+        } catch (err) {
+          console.error("failed to persist conversation", err);
+          // fallback to storing locally without id
+          const conv: Conversation = {
+            id: Date.now(),
+            title,
+            messages: [
+              { role: "user", content: pendingPrompt },
+              { role: "assistant", content: response },
+            ],
+          };
+          setSavedConversations((prev: Conversation[]) => [conv, ...prev]);
+        }
+      })();
+
+      setPendingPrompt(null);
     }
   }, [loading, response, pendingPrompt]);
 
@@ -63,7 +121,7 @@ export default function Chat() {
 
   const handleRetry = () => {
     if (!lastSentPrompt) return;
-    setHistory((prev) => [...prev, { role: "user", content: lastSentPrompt }]);
+    setHistory((prev: Message[]) => [...prev, { role: "user", content: lastSentPrompt }]);
     setPendingPrompt(lastSentPrompt);
     sendPrompt(lastSentPrompt);
   };
@@ -74,7 +132,12 @@ export default function Chat() {
         conversations={savedConversations}
         selectedId={selectedConversationId}
         onSelect={openConversation}
-        onClear={() => {
+        onClear={async () => {
+          try {
+            await fetch("/history", { method: "DELETE" });
+          } catch (err) {
+            console.error("failed to clear history", err);
+          }
           setSavedConversations([]);
           setSelectedConversationId(null);
         }}
@@ -126,37 +189,9 @@ export default function Chat() {
 
             {/* streaming / assistant bubble for current chat interaction */}
             {loading ? (
-              <div style={{ textAlign: "left", margin: "8px 0" }}>
-                <span
-                  style={{
-                    display: "inline-block",
-                    padding: "10px 14px",
-                    borderRadius: 12,
-                    backgroundColor: "#F1F0F0",
-                    maxWidth: "80%",
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
-                  {response || "..."}
-                </span>
-              </div>
+              <ChatMessage message={{ role: "assistant", content: response || "..." }} />
             ) : (
-              response && (
-                <div style={{ textAlign: "left", margin: "8px 0" }}>
-                  <span
-                    style={{
-                      display: "inline-block",
-                      padding: "10px 14px",
-                      borderRadius: 12,
-                      backgroundColor: "#F1F0F0",
-                      maxWidth: "80%",
-                      whiteSpace: "pre-wrap",
-                    }}
-                  >
-                    {response}
-                  </span>
-                </div>
-              )
+              response && <ChatMessage message={{ role: "assistant", content: response }} />
             )}
 
             <div ref={messagesEndRef} />
