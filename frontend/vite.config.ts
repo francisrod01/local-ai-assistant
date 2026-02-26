@@ -12,7 +12,39 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         ws: true,
-      }
+      },
+      "/chat": {
+        target: "http://backend:8000",
+        changeOrigin: true,
+        secure: false,
+        // only proxy non-GET requests; allow frontend dev server to serve the
+        // React page for GET so the client-side router can render.
+        bypass: (req: { method: string; url: string }) => {
+          if (req.method === "GET") {
+            return req.url;
+          }
+        },
+      },
+      "/history": {
+        target: "http://backend:8000",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/models": {
+        target: "http://backend:8000",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/health": {
+        target: "http://backend:8000",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/pull": {
+        target: "http://backend:8000",
+        changeOrigin: true,
+        secure: false,
+      },
     }
   },
 });
