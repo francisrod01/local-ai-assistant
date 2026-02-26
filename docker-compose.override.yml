@@ -9,8 +9,6 @@ services:
     # enable debug mode and mount the source code for live reload
     environment:
       - DEBUG=1
-    volumes:
-      - ./backend:/app
 
   frontend:
     build:
