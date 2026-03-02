@@ -5,6 +5,9 @@ WORKDIR /app
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+# upgrade pip to specified version before installing dependencies
+RUN pip install --upgrade pip==26.0.1
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
