@@ -6,12 +6,23 @@ interface Props {
   selectedId?: number | null;
   onSelect: (c: Conversation) => void;
   onClear: () => void;
+  onNew: () => void; // start a fresh chat
 }
 
-export default function SavedConversations({ conversations, selectedId, onSelect, onClear }: Props) {
+export default function SavedConversations({ conversations, selectedId, onSelect, onClear, onNew }: Props) {
   return (
     <aside style={{ width: 260 }}>
-      <h3 style={{ marginTop: 0 }}>Conversations</h3>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <h3 style={{ marginTop: 0 }}>Conversations</h3>
+        <button
+          aria-label="New conversation"
+          title="New conversation"
+          onClick={onNew}
+          style={{ fontSize: 18, lineHeight: 1, padding: "0 6px", cursor: "pointer" }}
+        >
+          +
+        </button>
+      </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: "70vh", overflowY: "auto" }}>
         {conversations.length === 0 && (

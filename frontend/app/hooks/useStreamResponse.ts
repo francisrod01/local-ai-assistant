@@ -56,5 +56,14 @@ export function useStreamResponse() {
     setLoading(false);
   };
 
-  return { response, loading, error, retryAvailable, sendPrompt, cancelPrompt };
+  const reset = () => {
+    // clear everything; used when starting a new conversation
+    abortController.current = null;
+    setResponse("");
+    setError(null);
+    setRetryAvailable(false);
+    setLoading(false);
+  };
+
+  return { response, loading, error, retryAvailable, sendPrompt, cancelPrompt, reset };
 }

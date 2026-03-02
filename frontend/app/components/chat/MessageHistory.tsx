@@ -1,6 +1,6 @@
 import React from "react";
 import ChatMessage from "./ChatMessage";
-import type { Message } from "./types";
+import type { Message } from "../types";
 
 interface Props {
   history: Message[];
