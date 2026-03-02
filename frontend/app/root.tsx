@@ -5,7 +5,9 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "react-router";
+import { Header } from "./components/Header";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -24,6 +26,10 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  // `Layout` is the outer HTML document shell during SSR. It must not
+  // consume any router hooks (e.g. `useLocation`) because it renders before
+  // the router provider is mounted.  All UI that depends on routes therefore
+  // lives inside `App` below.
   return (
     <html lang="en">
       <head>
@@ -42,7 +48,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const location = useLocation();
+  const isLanding = location.pathname === "/";
+
+  return (
+    <>
+      {!isLanding && <Header />}
+      <Outlet />
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
