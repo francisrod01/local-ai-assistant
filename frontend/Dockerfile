@@ -1,6 +1,6 @@
 # Base image with upgraded npm
 FROM node:20-alpine AS base
-RUN npm install -g npm@11.10.0
+RUN npm install -g npm@11.11.0
 WORKDIR /app
 
 # Development stage (installs devDependencies too)
