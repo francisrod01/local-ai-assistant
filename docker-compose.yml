@@ -44,7 +44,7 @@ services:
     volumes:
       - ${BACKEND_VOLUME_PATH}:/app/data
     ports:
-      - "5000:5000"
+      - "8000:8000"
     environment:
       - DATABASE_URL=${POSTGRES_URL}
       - OLLAMA_URL=${OLLAMA_URL}

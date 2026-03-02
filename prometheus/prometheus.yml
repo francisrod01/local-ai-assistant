@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'backend'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['backend:8000']
+
+  # Ollama does **not** currently expose a Prometheus endpoint (checked via curl; 404 returned).
+  # If a future release provides metrics, re-enable this job and adjust metrics_path accordingly.
+  # - job_name: 'ollama'
+  #   metrics_path: '/metrics'
+  #   static_configs:
+  #     - targets: ['ollama:11434']
