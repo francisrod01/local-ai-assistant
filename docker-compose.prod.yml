@@ -1,0 +1,40 @@
+# Production-specific docker-compose adjustments.  Intended to be used with
+# `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`.
+
+services:
+  backend:
+    build: ./backend
+    environment:
+      - ENV=production
+    ports:
+      - "80:8000"
+    restart: unless-stopped
+    expose:
+      - 8000
+
+  frontend:
+    build: ./frontend
+    environment:
+      - NODE_ENV=production
+    # In production we expect front-end to be built (served by nginx or similar);
+    # the application is fronted by nginx, so there's no need to map host ports here.
+    # ports:
+    #   - "3000:3000"
+    restart: unless-stopped
+    command: ["npm", "run", "start"] # runs react-router-serve
+    expose:
+      - 3000
+
+  nginx:
+    # optional nginx service for production
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: local-ai-nginx
+    # publish nginx on host port 3000 (matches the frontend's internal port)
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
