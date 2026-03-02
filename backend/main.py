@@ -15,6 +15,30 @@ from routes import chat, history
 app.include_router(chat.router)
 app.include_router(history.router)
 
+# --- telemetry middleware -------------------------------------------------
+# import metrics after routers to avoid circular imports
+from metrics import REQUEST_COUNT, REQUEST_LATENCY
+
+@app.middleware("http")
+async def record_metrics(request, call_next):
+    """FastAPI middleware that increments Prometheus counters and histograms."""
+    import time
+    start = time.time()
+    response = await call_next(request)
+    latency = time.time() - start
+    endpoint = request.url.path
+    method = request.method
+    REQUEST_COUNT.labels(endpoint=endpoint, method=method).inc()
+    REQUEST_LATENCY.labels(endpoint=endpoint).observe(latency)
+    return response
+
+# expose /metrics for Prometheus scrapers
+from metrics import metrics_response
+
+@app.get("/metrics")
+def metrics_endpoint():
+    return metrics_response()
+
 # create database tables on startup
 @app.on_event("startup")
 def startup_event():
