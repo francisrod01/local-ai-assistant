@@ -14,10 +14,10 @@ def test_counters_increment_on_chat(monkeypatch):
     class DummyResp:
         def json(self):
             return {"response": "hi", "usage": {"total_tokens": 5}}
-    
+
     def fake_post(url, json, **kwargs):
         return DummyResp()
-    
+
     monkeypatch.setattr("routes.chat.requests.post", fake_post)
 
     client = TestClient(app)
@@ -45,14 +45,14 @@ def test_ollama_status_endpoint(monkeypatch):
     class DummyPS:
         def json(self):
             return {"models": ["phi3:mini"]}
-    
+
     def fake_get(url, **kwargs):
         class R:
             def json(self):
                 return {"models": ["phi3:mini"]}
             headers = {"Date": "now"}
         return R()
-    
+
     monkeypatch.setattr("routes.chat.requests.get", fake_get)
     client = TestClient(app)
     resp = client.get("/ollama_status")
@@ -60,3 +60,18 @@ def test_ollama_status_endpoint(monkeypatch):
     assert resp.json().get("models") == ["phi3:mini"]
 
 
+def test_chromadb_endpoints_and_metrics():
+    client = TestClient(app)
+    # insert 3 vectors
+    resp = client.post("/chroma/insert", json={"num_vectors": 3})
+    assert resp.status_code == 200
+    assert resp.json()["vectors"] == 3
+    # record a query latency
+    resp = client.post("/chroma/query", json={"latency": 0.42})
+    assert resp.status_code == 200
+    # metrics endpoint should now contain chromadb metrics
+    resp = client.get("/metrics")
+    body = resp.text
+    assert "chromadb_vector_insertions_total" in body
+    assert "chromadb_query_duration_seconds" in body
+    assert "chromadb_index_size_bytes" in body

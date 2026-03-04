@@ -11,9 +11,11 @@ from db import engine
 app = FastAPI()
 
 # register sub-routers
-from routes import chat, history
+from routes import chat, ollama, history, chroma
 app.include_router(chat.router)
+app.include_router(ollama.router)
 app.include_router(history.router)
+app.include_router(chroma.router)
 
 # --- telemetry middleware -------------------------------------------------
 # import metrics after routers to avoid circular imports
@@ -46,5 +48,7 @@ def startup_event():
     import db as _db
     _db.Base.metadata.create_all(bind=engine)
 
-# chat/ollama endpoints are handled in routes/chat.py
+# `/chat` and `/chat_stream` endpoints are defined in routes/chat.py
+# other Ollama helpers (models, pull, health, status) live in routes/ollama.py
+# chroma-related dummy telemetry endpoints live in routes/chroma.py
 # persistence routes live in routes/history.py
