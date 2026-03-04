@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
+import os
 
 # load environment variables from .env file (development)
 load_dotenv()
@@ -52,6 +53,25 @@ async def lifespan(app: FastAPI):
     # use Base from db since that's where it is defined
     import db as _db
     _db.Base.metadata.create_all(bind=engine)
+
+    # warm up the default Ollama model so the first real user request doesn't
+    # pay the cost of loading 2 GB into memory.  a short dummy generate call is
+    # sufficient; the OLLAMA_MAX_LOADED_MODELS env var (see compose files) keeps
+    # it resident.
+    try:
+        # we avoid importing routes.chat to prevent circular dependencies
+        model = "phi3:mini"
+        import requests
+        requests.post(
+            f"{os.getenv('OLLAMA_URL','http://ollama:11434')}/api/generate",
+            json={"model": model, "prompt": "Hello", "stream": False, "num_predict": 1},
+            timeout=5,
+        )
+    except Exception:
+        # don't crash the app if Ollama isn't up yet; the init container already
+        # pulls models and the backend will retry later.
+        pass
+
     yield
 
 # assign the lifespan handler

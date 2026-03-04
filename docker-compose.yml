@@ -36,6 +36,15 @@ services:
     volumes:
       - ${OLLAMA_VOLUME_PATH}:/root/.ollama
     restart: unless-stopped
+    # persistently tune Ollama for minimal memory use across environments
+    environment:
+      # keep only one resident model so phi3:mini stays loaded
+      - OLLAMA_MAX_LOADED_MODELS=1
+      # shrink default context length; frontend controls prompt size so 1‑2k is fine
+      - OLLAMA_CONTEXT_LENGTH=1024
+      # limit parallelism to avoid contention on low‑RAM hosts
+      - OLLAMA_NUM_PARALLEL=1
+      # additional settings can be adjusted in override for dev/test
 
   ollama-init:
     image: ollama/ollama:latest

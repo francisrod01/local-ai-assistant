@@ -9,6 +9,28 @@ def test_metrics_endpoint_present():
     assert "python_gc_objects_collected_total" in body
 
 
+def test_startup_warms_model(monkeypatch):
+    # the lifespan context in main.py sends a small generate request; ensure
+    # it is issued without blowing up.  monkeypatch the global requests.post so
+    # we catch the call.
+    called = {"url": None, "json": None}
+
+    def fake_post(url, json, **kwargs):
+        called["url"] = url
+        called["json"] = json
+        class Dummy:
+            def json(self):
+                return {}
+        return Dummy()
+
+    monkeypatch.setattr("requests.post", fake_post)
+    # constructing a new TestClient will trigger the startup event
+    client = TestClient(app)
+    assert called["url"] and "/api/generate" in called["url"]
+    # guard against None so pylance stops complaining about attribute access
+    assert called["json"] is not None and called["json"].get("model") == "phi3:mini"
+
+
 def test_counters_increment_on_chat(monkeypatch):
     # simulate a chat response with usage
     class DummyResp:
