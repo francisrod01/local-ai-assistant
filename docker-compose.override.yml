@@ -56,6 +56,7 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${PROMETHEUS_VOLUME_PATH:-prometheus-data}:/prometheus
     depends_on:
       - backend
       - ollama
@@ -74,3 +75,46 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on:
       - prometheus
+
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: local-ai-redis-exporter
+    environment:
+      - REDIS_ADDR=redis:6379
+    depends_on:
+      - redis
+
+  postgres-exporter:
+    image: wrouesnel/postgres_exporter:latest
+    container_name: local-ai-postgres-exporter
+    environment:
+      - DATA_SOURCE_NAME=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+    depends_on:
+      - postgres
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: local-ai-node-exporter
+    ports:
+      - "9100:9100"
+
+  loki:
+    image: grafana/loki:latest
+    container_name: local-ai-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/config.yaml:/etc/loki/local-config.yaml:ro
+      - ${LOKI_DATA_VOLUME_PATH:-loki-data}:/loki
+      - ${LOKI_DATA_VOLUME_PATH:-loki-data}:/wal
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: local-ai-promtail
+    volumes:
+      - /var/log:/var/log
+      - ./promtail/config.yaml:/etc/promtail/config.yaml:ro
+    command: -config.file=/etc/promtail/config.yaml
+    depends_on:
+      - loki

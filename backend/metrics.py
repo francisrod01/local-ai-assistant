@@ -1,4 +1,4 @@
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST, Gauge
 from fastapi import Response
 
 # counters and histograms for backend telemetry
@@ -16,6 +16,20 @@ TOKENS_USED = Counter(
     "backend_tokens_total",
     "Total number of tokens consumed by requests",  # approximate or reported by the LLM
     ["model"],
+)
+
+# ChromaDB metrics (updated from workflow merge)
+CHROMADB_INSERTIONS = Counter(
+    "chromadb_vector_insertions_total",
+    "Total number of vector insertions into ChromaDB",
+)
+CHROMADB_QUERY_LATENCY = Histogram(
+    "chromadb_query_duration_seconds",
+    "Latency of ChromaDB queries in seconds",
+)
+CHROMADB_INDEX_SIZE = Gauge(
+    "chromadb_index_size_bytes",
+    "Size of ChromaDB index in bytes",
 )
 
 # Ollama-specific metrics
@@ -43,6 +57,21 @@ def refresh_ollama_models_loaded(ollama_url: str):
     except Exception:
         # ignore failures, leave previous value
         pass
+
+
+def observe_chromadb_insertion(count: int = 1):
+    """Increment ChromaDB insertion counter by `count`."""
+    CHROMADB_INSERTIONS.inc(count)
+
+
+def observe_chromadb_query(latency: float):
+    """Record latency for a ChromaDB query (seconds)."""
+    CHROMADB_QUERY_LATENCY.observe(latency)
+
+
+def set_chromadb_index_size(bytes: float):
+    """Update the recorded index size in bytes."""
+    CHROMADB_INDEX_SIZE.set(bytes)
 
 
 def metrics_response() -> Response:

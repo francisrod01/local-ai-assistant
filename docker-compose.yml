@@ -11,6 +11,23 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis:7
+    container_name: local-ai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ${REDISDATA_VOLUME_PATH:-redisdata}:/data
+
+  loki:
+    image: grafana/loki:latest
+    container_name: local-ai-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ${LOKI_DATA_VOLUME_PATH:-loki-data}:/loki/data
+    command: -config.file=/etc/loki/local-config.yaml
+
   ollama:
     image: ollama/ollama:latest
     container_name: local-ai-ollama
@@ -68,3 +85,6 @@ services:
 
 volumes:
   pgdata:
+  redisdata:
+  loki-data:
+  prometheus-data:

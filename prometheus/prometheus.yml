@@ -7,9 +7,27 @@ scrape_configs:
     static_configs:
       - targets: ['backend:8000']
 
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
+  - job_name: 'node'
+    # node-exporter will expose host-level metrics, used here as a standin for frontend stats.
+    static_configs:
+      - targets: ['node-exporter:9100']
+
   # Ollama does **not** currently expose a Prometheus endpoint (checked via curl; 404 returned).
   # If a future release provides metrics, re-enable this job and adjust metrics_path accordingly.
   # - job_name: 'ollama'
   #   metrics_path: '/metrics'
   #   static_configs:
   #     - targets: ['ollama:11434']
+
+  # future: scrape ChromaDB exporter once one is implemented
+  # - job_name: 'chromadb'
+  #   static_configs:
+  #     - targets: ['chromadb-exporter:someport']

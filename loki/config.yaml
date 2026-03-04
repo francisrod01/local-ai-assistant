@@ -1,0 +1,25 @@
+auth_enabled: false
+server:
+  http_listen_port: 3100
+ingester:
+  lifecycler:
+    address: 127.0.0.1
+    ring:
+      kvstore:
+        store: inmemory
+  chunk_idle_period: 5m
+  chunk_retain_period: 30s
+limits_config:
+  allow_structured_metadata: false
+storage_config:
+  boltdb:
+    directory: /loki/data
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h

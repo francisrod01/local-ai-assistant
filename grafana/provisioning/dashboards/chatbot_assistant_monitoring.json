@@ -1,0 +1,254 @@
+{
+  "id": null,
+  "title": "Chatbot Assistant Monitoring",
+  "tags": [
+    "chatbot",
+    "performance"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 30,
+  "version": 1,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Backend p95 Latency",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(backend_request_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Backend Error Rate (4xx/5xx)",
+      "targets": [
+        {
+          "expr": "sum(rate(backend_requests_total{status=~\"4..|5..\"}[5m]))",
+          "legendFormat": "errors/s"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      }
+    },
+    {
+      "type": "gauge",
+      "title": "Redis Cache Hit Ratio",
+      "targets": [
+        {
+          "expr": "(redis_hits_total) / (redis_hits_total + redis_misses_total)",
+          "legendFormat": "hit ratio"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Redis Memory Usage",
+      "targets": [
+        {
+          "expr": "redis_memory_used_bytes / 1024 / 1024",
+          "legendFormat": "MB"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      }
+    },
+    {
+      "type": "heatmap",
+      "title": "Postgres Query Latency",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(postgres_query_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Postgres Active Connections",
+      "targets": [
+        {
+          "expr": "postgres_active_connections",
+          "legendFormat": "connections"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "ChromaDB Insertions/sec",
+      "targets": [
+        {
+          "expr": "rate(chromadb_vector_insertions_total[5m])",
+          "legendFormat": "insertions/s"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      }
+    },
+    {
+      "type": "gauge",
+      "title": "ChromaDB Index Size (MB)",
+      "targets": [
+        {
+          "expr": "chromadb_index_size_bytes / 1024 / 1024",
+          "legendFormat": "MB"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      }
+    },
+    {
+      "type": "bar",
+      "title": "Ollama Model Invocations",
+      "targets": [
+        {
+          "expr": "sum(rate(ollama_requests_total[5m])) by (model)",
+          "legendFormat": "{{model}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Ollama Avg Response Time",
+      "targets": [
+        {
+          "expr": "rate(ollama_response_duration_seconds_sum[5m]) / rate(ollama_response_duration_seconds_count[5m])",
+          "legendFormat": "sec"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Frontend API Latency",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(frontend_request_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Frontend Active Sessions",
+      "targets": [
+        {
+          "expr": "frontend_active_sessions",
+          "legendFormat": "sessions"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Backend Token Consumption",
+      "targets": [
+        {
+          "expr": "sum(rate(backend_tokens_total[5m]))",
+          "legendFormat": "tokens/s"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 56
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Ollama Models Loaded",
+      "targets": [
+        {
+          "expr": "ollama_models_loaded",
+          "legendFormat": "count"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 56
+      }
+    },
+    {
+      "type": "logs",
+      "title": "Error Logs",
+      "targets": [
+        {
+          "expr": "{job=\"backend\", level=\"error\"} |~ \"(redis eviction|model load failure)\"",
+          "refId": "A"
+        }
+      ],
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      }
+    }
+  ],
+  "refresh": "15s"
+}

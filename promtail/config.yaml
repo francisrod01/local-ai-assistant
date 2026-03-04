@@ -1,0 +1,29 @@
+server:
+  http_listen_port: 9080
+positions:
+  filename: /tmp/positions.yaml
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: docker-containers
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: docker
+          __path__: /var/lib/docker/containers/*/*.log
+    # add an explicit `app` label based on container name for easier querying
+    relabel_configs:
+      - source_labels: [__meta_docker_container_name]
+        regex: local-ai-backend
+        target_label: app
+        replacement: backend
+      - source_labels: [__meta_docker_container_name]
+        regex: local-ai-frontend
+        target_label: app
+        replacement: frontend
+      - source_labels: [__meta_docker_container_name]
+        regex: local-ai-.*
+        target_label: container
+        replacement: "$1"
