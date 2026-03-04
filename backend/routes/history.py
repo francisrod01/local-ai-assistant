@@ -15,6 +15,8 @@ class InteractionCreate(BaseModel):
     user: str = "user_1"
 
 
+from pydantic import ConfigDict
+
 class InteractionOut(BaseModel):
     id: int
     prompt: str
@@ -22,10 +24,9 @@ class InteractionOut(BaseModel):
     user: str
     created_at: datetime
 
-    class Config:
-        orm_mode = True
-        # pydantic v2 requires this for from_orm/from_attributes to work
-        from_attributes = True
+    # Pydantic v2 style config: `orm_mode` replaced by
+    # `from_attributes` and we supply a ConfigDict instance.
+    model_config = ConfigDict(from_attributes=True)
 
 
 def get_db():

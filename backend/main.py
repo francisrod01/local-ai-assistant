@@ -41,12 +41,21 @@ from metrics import metrics_response
 def metrics_endpoint():
     return metrics_response()
 
-# create database tables on startup
-@app.on_event("startup")
-def startup_event():
+# create database tables when the application starts and provide a
+# lifespan context for any future startup/shutdown tasks. This ensures the DB
+# is ready before any requests are handled, and also allows for clean shutdown
+# if we later want to add things like connection cleanup, etc.
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     # use Base from db since that's where it is defined
     import db as _db
     _db.Base.metadata.create_all(bind=engine)
+    yield
+
+# assign the lifespan handler
+app.router.lifespan_context = lifespan
 
 # `/chat` and `/chat_stream` endpoints are defined in routes/chat.py
 # other Ollama helpers (models, pull, health, status) live in routes/ollama.py
