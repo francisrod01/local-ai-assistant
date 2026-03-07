@@ -30,7 +30,7 @@ def health():
     try:
         response = requests.get(f"{OLLAMA_URL}/")
         return {"status": response.status_code, "message": response.text}
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         return {"status": "error", "message": str(e)}
 
 
@@ -47,5 +47,5 @@ def ollama_status():
         response = requests.get(f"{OLLAMA_URL}/api/ps")
         data = response.json()
         return {"models": data.get("models", []), "timestamp": response.headers.get("Date")}
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         return {"models": [], "error": str(e)}

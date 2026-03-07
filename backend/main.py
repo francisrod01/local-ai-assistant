@@ -12,11 +12,12 @@ from db import engine
 app = FastAPI()
 
 # register sub-routers
-from routes import chat, ollama, history, chroma
+from routes import chat, ollama, history, chroma, monitoring
 app.include_router(chat.router)
 app.include_router(ollama.router)
 app.include_router(history.router)
 app.include_router(chroma.router)
+app.include_router(monitoring.router)
 
 # --- telemetry middleware -------------------------------------------------
 # import metrics after routers to avoid circular imports
@@ -47,6 +48,21 @@ def metrics_endpoint():
 # is ready before any requests are handled, and also allows for clean shutdown
 # if we later want to add things like connection cleanup, etc.
 from contextlib import asynccontextmanager
+from redis_store import set_system_flag
+
+
+def _env_float(name: str, default: float) -> float:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
+
+OLLAMA_WARMUP_TIMEOUT_SECONDS = _env_float("OLLAMA_WARMUP_TIMEOUT_SECONDS", 90.0)
+OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "15m")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -59,18 +75,27 @@ async def lifespan(app: FastAPI):
     # sufficient; the OLLAMA_MAX_LOADED_MODELS env var (see compose files) keeps
     # it resident.
     try:
+        set_system_flag("model_warming_up", "1", ttl_seconds=180)
         # we avoid importing routes.chat to prevent circular dependencies
         model = "phi3:mini"
         import requests
         requests.post(
             f"{os.getenv('OLLAMA_URL','http://ollama:11434')}/api/generate",
-            json={"model": model, "prompt": "Hello", "stream": False, "num_predict": 1},
-            timeout=5,
+            json={
+                "model": model,
+                "prompt": "Hello",
+                "stream": False,
+                "num_predict": 1,
+                "keep_alive": OLLAMA_KEEP_ALIVE,
+            },
+            timeout=OLLAMA_WARMUP_TIMEOUT_SECONDS,
         )
     except Exception:
         # don't crash the app if Ollama isn't up yet; the init container already
         # pulls models and the backend will retry later.
         pass
+    finally:
+        set_system_flag("model_warming_up", "0", ttl_seconds=180)
 
     yield
 
