@@ -6,8 +6,13 @@ from dotenv import load_dotenv
 # pull in .env values if present
 load_dotenv()
 
-# fall back to a local sqlite file when no environment variable is provided
-DATABASE_URL = os.getenv("POSTGRES_URL", "sqlite:///./data/local.db")
+# prefer DATABASE_URL for compatibility, then POSTGRES_URL; finally fall back
+# to a local sqlite file when no environment variable is provided.
+DATABASE_URL = (
+    os.getenv("DATABASE_URL")
+    or os.getenv("POSTGRES_URL")
+    or "sqlite:///./data/local.db"
+)
 
 # SQLAlchemy 2.0 requires the dialect name "postgresql"; some postgres urls still use
 # the legacy "postgres://" scheme, which results in a NoSuchModuleError.

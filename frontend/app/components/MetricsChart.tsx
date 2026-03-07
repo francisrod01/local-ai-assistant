@@ -8,23 +8,21 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import type { MetricEntry } from "./metricsParser";
 
 interface Props {
-  data: MetricEntry[];
-  types: Record<string, string>;
+  data: Array<{ name: string; value: number }>;
 }
 
-export default function MetricsChart({ data, types }: Props) {
-  const chartData = Object.values(
-    data.reduce((acc, m) => {
-      if (types[m.name] === "gauge") {
-        acc[m.name] = acc[m.name] || { name: m.name, value: m.value };
-        acc[m.name].value = m.value;
-      }
-      return acc;
-    }, {} as Record<string, { name: string; value: number }>)
-  );
+function abbreviate(value: number): string {
+  if (!Number.isFinite(value)) return "0";
+  if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
+  if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return `${Math.round(value)}`;
+}
+
+export default function MetricsChart({ data }: Props) {
+  const chartData = data.filter((item) => Number.isFinite(item.value));
 
   return (
     <div style={{ width: "100%", height: 400 }}>
@@ -32,8 +30,12 @@ export default function MetricsChart({ data, types }: Props) {
         <BarChart data={chartData} margin={{ top: 20, right: 30, bottom: 20, left: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
+          <YAxis tickFormatter={(value: number | string) => abbreviate(Number(value))} />
+          <Tooltip
+            formatter={(value: number | string) =>
+              Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })
+            }
+          />
           <Bar dataKey="value" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>

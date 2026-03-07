@@ -8,13 +8,14 @@ services:
     image: local-ai-backend:dev
     # enable debug mode and mount the source code for live reload
     environment:
-      - DEBUG=1
+      DEBUG: 1
     # mount only the backend sources into /app
     volumes:
       - ../local-ai-assistant/backend:/app:cached
-    # use uvicorn's reload flag when DEBUG is truthy
-    command: >
-      uvicorn main:app --host 0.0.0.0 --port 8000 ${DEBUG:+--reload}
+    ports:
+      - "8000:8000"
+    # explicit dev command with reload
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
   frontend:
     build:
@@ -23,7 +24,7 @@ services:
     image: local-ai-frontend:dev
     # run in development mode and mount source tree
     environment:
-      - NODE_ENV=development
+      NODE_ENV: development
     ports:
       - "5173:5173" # match React Router dev server port
     command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
@@ -40,13 +41,13 @@ services:
     restart: unless-stopped
     environment:
       # limit number of resident models to avoid RAM exhaustion
-      - OLLAMA_MAX_LOADED_MODELS=1
+      OLLAMA_MAX_LOADED_MODELS: "1"
       # reduce context window/token history to cut memory usage
-      - OLLAMA_CONTEXT_LENGTH=256
+      OLLAMA_CONTEXT_LENGTH: "256"
       # keep memory-mapping disabled so models stream from disk
-      - OLLAMA_NO_MMAP=false
+      OLLAMA_NO_MMAP: "false"
       # allow only one request at a time in dev to prevent contention
-      - OLLAMA_MAX_PARALLEL=1
+      OLLAMA_MAX_PARALLEL: "1"
       # optionally expose metrics / logging in future
 
   prometheus:
@@ -67,9 +68,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
       # load any dashboards from the mounted directory on startup
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
     volumes:
       # mount only the provisioning subdirectory (contains dashboards + datasources)
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
@@ -80,7 +81,7 @@ services:
     image: oliver006/redis_exporter:latest
     container_name: local-ai-redis-exporter
     environment:
-      - REDIS_ADDR=redis:6379
+      REDIS_ADDR: redis:6379
     depends_on:
       - redis
 
@@ -88,7 +89,7 @@ services:
     image: wrouesnel/postgres_exporter:latest
     container_name: local-ai-postgres-exporter
     environment:
-      - DATA_SOURCE_NAME=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      DATA_SOURCE_NAME: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
     depends_on:
       - postgres
 

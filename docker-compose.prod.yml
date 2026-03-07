@@ -5,7 +5,8 @@ services:
   backend:
     build: ./backend
     environment:
-      - ENV=production
+      ENV: production
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
     ports:
       - "80:8000"
     restart: unless-stopped
@@ -15,7 +16,7 @@ services:
   frontend:
     build: ./frontend
     environment:
-      - NODE_ENV=production
+      NODE_ENV: production
     # In production we expect front-end to be built (served by nginx or similar);
     # the application is fronted by nginx, so there's no need to map host ports here.
     # ports:

@@ -5,6 +5,7 @@ python-dotenv==1.0.1
 prometheus-client==0.17.0
 pytest==8.4.0
 httpx==0.28.1
+redis==5.2.1
 
 # database libraries
 SQLAlchemy>=2.0.0

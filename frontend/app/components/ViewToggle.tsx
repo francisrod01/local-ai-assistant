@@ -7,11 +7,31 @@ interface Props {
 
 export default function ViewToggle({ view, setView }: Props) {
   return (
-    <button
-      className="px-3 py-1 bg-blue-600 text-white rounded"
-      onClick={() => setView(view === "table" ? "chart" : "table")}
-    >
-      Switch to {view === "table" ? "chart" : "table"} view
-    </button>
+    <div className="inline-flex overflow-hidden rounded border bg-white">
+      <button
+        type="button"
+        className={`px-3 py-1.5 text-sm ${
+          view === "table"
+            ? "bg-blue-600 text-white"
+            : "bg-white text-gray-700 hover:bg-gray-50"
+        }`}
+        onClick={() => setView("table")}
+        aria-pressed={view === "table"}
+      >
+        ▦ Table
+      </button>
+      <button
+        type="button"
+        className={`border-l px-3 py-1.5 text-sm ${
+          view === "chart"
+            ? "bg-blue-600 text-white"
+            : "bg-white text-gray-700 hover:bg-gray-50"
+        }`}
+        onClick={() => setView("chart")}
+        aria-pressed={view === "chart"}
+      >
+        📈 Chart
+      </button>
+    </div>
   );
 }
