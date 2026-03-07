@@ -39,11 +39,11 @@ services:
     # persistently tune Ollama for minimal memory use across environments
     environment:
       # keep only one resident model so phi3:mini stays loaded
-      - OLLAMA_MAX_LOADED_MODELS=1
+      OLLAMA_MAX_LOADED_MODELS: "1"
       # shrink default context length; frontend controls prompt size so 1‑2k is fine
-      - OLLAMA_CONTEXT_LENGTH=1024
+      OLLAMA_CONTEXT_LENGTH: "1024"
       # limit parallelism to avoid contention on low‑RAM hosts
-      - OLLAMA_NUM_PARALLEL=1
+      OLLAMA_NUM_PARALLEL: "1"
       # additional settings can be adjusted in override for dev/test
 
   ollama-init:
@@ -54,7 +54,7 @@ services:
     volumes:
       - ${OLLAMA_VOLUME_PATH}:/root/.ollama
     environment:
-      - OLLAMA_HOST=http://ollama:11434
+      OLLAMA_HOST: http://ollama:11434
     entrypoint: ["/bin/sh", "-c"]
     command: >
       "until ollama list; do
@@ -69,13 +69,26 @@ services:
     container_name: local-ai-backend
     volumes:
       - ${BACKEND_VOLUME_PATH}:/app/data
-    ports:
-      - "8000:8000"
+      # allow backend to talk to Docker daemon for log retrieval
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - DATABASE_URL=${POSTGRES_URL}
-      - OLLAMA_URL=${OLLAMA_URL}
+      POSTGRES_URL: ${BACKEND_POSTGRES_URL:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}}
+      DATABASE_URL: ${BACKEND_POSTGRES_URL:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}}
+      OLLAMA_URL: ${OLLAMA_URL}
+      OLLAMA_REQUEST_TIMEOUT_SECONDS: ${OLLAMA_REQUEST_TIMEOUT_SECONDS:-300}
+      OLLAMA_STREAM_CONNECT_TIMEOUT_SECONDS: ${OLLAMA_STREAM_CONNECT_TIMEOUT_SECONDS:-10}
+      OLLAMA_STREAM_READ_TIMEOUT_SECONDS: ${OLLAMA_STREAM_READ_TIMEOUT_SECONDS:-600}
+      OLLAMA_WARMUP_TIMEOUT_SECONDS: ${OLLAMA_WARMUP_TIMEOUT_SECONDS:-90}
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-15m}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      REDIS_CACHE_TTL_SECONDS: ${REDIS_CACHE_TTL_SECONDS:-3600}
+      REDIS_SESSION_TTL_SECONDS: ${REDIS_SESSION_TTL_SECONDS:-86400}
+      REDIS_STREAM_TTL_SECONDS: ${REDIS_STREAM_TTL_SECONDS:-300}
+      RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-60}
+      RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-30}
     depends_on:
       - postgres
+      - redis
       - ollama
 
   frontend:
