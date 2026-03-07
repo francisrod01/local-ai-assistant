@@ -22,20 +22,38 @@ export default function MetricsPage() {
   }, []);
 
   const { data, types } = parseMetrics(metrics);
+  const [filter, setFilter] = useState("");
+
+  // apply the filter to data (simple substring match on metric name)
+  const filteredData = data.filter((m) => m.name.includes(filter));
 
   return (
     <main className="pt-16 p-4 container mx-auto">
       <h2>Backend Metrics</h2>
-      <div className="mb-4">
+      <p className="mb-4 text-sm text-gray-600">
+        Prometheus-style telemetry exposed by the backend.  Use the filter to
+        narrow down to specific metric names; toggle between a table and a
+        simple bar chart for gauges.
+      </p>
+      <div className="mb-4 flex flex-wrap items-center gap-4">
         <ViewToggle view={view} setView={setView} />
+        <label className="text-sm">
+          Filter:
+          <input
+            className="ml-2 px-2 py-1 border rounded"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder="metric name substring"
+          />
+        </label>
       </div>
 
       {error && <p className="text-red-600">Error: {error}</p>}
       {metrics ? (
         view === "table" ? (
-          <MetricsTable data={data} />
+          <MetricsTable data={filteredData} />
         ) : (
-          <MetricsChart data={data} types={types} />
+          <MetricsChart data={filteredData} types={types} />
         )
       ) : (
         <p>Loading...</p>

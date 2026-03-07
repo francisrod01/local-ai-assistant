@@ -15,6 +15,15 @@ export function Header() {
           <Link to="/ollama_status" className="hover:underline">
             Ollama&nbsp;Status
           </Link>
+          <Link to="/insights" className="hover:underline">
+            Insights
+          </Link>
+          <Link to="/environment" className="hover:underline">
+            Env
+          </Link>
+          <Link to="/logs" className="hover:underline">
+            Logs
+          </Link>
           <Link to="/metrics" className="hover:underline">
             Metrics
           </Link>

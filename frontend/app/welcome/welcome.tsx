@@ -37,6 +37,9 @@ export function Welcome() {
           >
             Get Started&nbsp;→
           </Link>
+          <p className="mt-6 text-sm text-gray-600 max-w-[400px]">
+            You can also view the raw <Link to="/ollama_status" className="underline">Ollama status</Link> or the <Link to="/metrics" className="underline">Prometheus metrics</Link> directly.
+          </p>
         </div>
       </div>
     </main>
