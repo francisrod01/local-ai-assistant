@@ -5,6 +5,7 @@ from datetime import datetime
 
 from crud import interaction
 import db
+from redis_store import get_session_turns
 
 router = APIRouter()
 
@@ -47,6 +48,11 @@ def create_history_item(item: InteractionCreate, db: Session = Depends(get_db)):
 def list_history(db: Session = Depends(get_db)):
     rows = interaction.list_interactions(db, "user_1")
     return [InteractionOut.from_orm(r) for r in rows]
+
+
+@router.get("/history/session/{user}")
+def list_session_history(user: str, limit: int = 20):
+    return {"user": user, "interactions": get_session_turns(user, limit=limit)}
 
 
 @router.get("/history/{item_id}", response_model=InteractionOut)

@@ -3,10 +3,11 @@ import os
 import subprocess
 import socket
 import http.client
-from typing import Any
+from typing import Any, List
 import requests
 
 from db import SessionLocal
+from redis_store import runtime_snapshot
 
 router = APIRouter()
 
@@ -121,6 +122,12 @@ def ollama_logs(tail: int = 200):
             if l not in existing:
                 _log_history.append(l)
     return {"logs": _log_history}
+
+
+@router.get("/runtime_status")
+def runtime_status():
+    """Return ephemeral runtime flags and queue state for frontend polling."""
+    return runtime_snapshot()
 
 
 @router.get("/interaction_insights")
