@@ -6,6 +6,10 @@ interface Props {
 }
 
 export default function VariableTable({ env }: Props) {
+  const isModelArray = (key: string, value: unknown) => {
+    return (key === "models" || key === "all_models") && Array.isArray(value);
+  };
+
   return (
     <div className="overflow-auto">
       <table className="w-full table-auto border-collapse">
@@ -20,7 +24,7 @@ export default function VariableTable({ env }: Props) {
             <tr key={k}>
               <td className="border px-2 py-1 align-top">{k}</td>
               <td className="border px-2 py-1">
-                {k === "models" && Array.isArray(v) ? (
+                {isModelArray(k, v) ? (
                   <div className="space-y-2">
                     {v.map((item: any, idx: number) => (
                       <ModelEntry key={idx} data={item} />

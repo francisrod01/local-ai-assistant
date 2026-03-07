@@ -1,87 +1,64 @@
-# Welcome to React Router!
+# Frontend Run Guide
 
-A modern, production-ready template for building full-stack React applications using React Router.
+This frontend is a React Router app served in development by Vite/React Router dev server.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## Recommended: Run with Docker Compose (Development)
 
-## Features
+From the repository root:
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+```bash
+docker compose up --build frontend -d
+```
 
-## Getting Started
+Notes:
 
-### Installation
+- This uses `docker-compose.yml` + `docker-compose.override.yml` by default.
+- The frontend will be available at `http://localhost:5173`.
+- Backend and its dependencies are started automatically through `depends_on`.
 
-Install the dependencies:
+Ports (development):
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:8000`
+- Prometheus: `http://localhost:9090`
+- Grafana: `http://localhost:3000`
+
+
+## Run with Docker Compose (Production-Style)
+
+From the repository root:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build frontend nginx -d
+```
+
+Endpoints:
+- Frontend via Nginx: `http://localhost:3000`
+- Backend API: `http://localhost:80`
+
+Stop commands:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.override.yml down
+docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+```
+
+## Frontend Commands (Inside frontend/)
 
 ```bash
 npm install
-```
-
-### Development
-
-Start the development server with HMR:
-
-```bash
 npm run dev
-```
-
-Your application will be available at `http://localhost:5173`.
-
-## Building for Production
-
-Create a production build:
-
-```bash
 npm run build
+npm run start
+npm run typecheck
 ```
 
-## Deployment
+## Local (Non-Container) Caveat
 
-### Docker Deployment
+The Vite proxy in this project points API traffic to `http://backend:8000`.
+That hostname is available in the Docker network, not on your host OS.
 
-To build and run using Docker:
+If you run frontend directly on host, you must either:
 
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+- run the app inside Compose (recommended), or
+- adjust proxy targets to `http://localhost:8000` for host-based development.

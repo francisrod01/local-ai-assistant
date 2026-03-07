@@ -12,7 +12,7 @@ export default function InsightsPage() {
   }, []);
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
+    <main className="pt-[30px] p-4 container mx-auto">
       <h2>Interaction Insights</h2>
       <p className="mb-4 text-sm text-gray-600">
         Aggregated summary of chat history: counts, frequent prompt terms, and

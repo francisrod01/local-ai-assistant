@@ -46,7 +46,15 @@ export default function ChatView({
   lastSentPrompt,
 }: Props) {
   return (
-    <div style={{ display: "flex", gap: 24, padding: 20, maxWidth: 1100, margin: "auto" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: 24,
+        padding: "30px 20px 20px",
+        maxWidth: 1100,
+        margin: "auto",
+      }}
+    >
       <SavedConversations
         conversations={savedConversations}
         selectedId={selectedConversationId}

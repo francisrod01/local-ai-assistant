@@ -17,12 +17,16 @@ export default function OllamaStatus() {
   }, []);
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
+    <main className="pt-[30px] p-4 container mx-auto">
       <h2>Ollama Status</h2>
       <p className="mb-4 text-sm text-gray-600">
         Displays the current models loaded into the Ollama runner along with a
         timestamp. This page is intended for quick health checks and monitoring
         which model is actively resident in memory.
+      </p>
+      <p className="mb-4 text-sm text-gray-600">
+        Note: this page shows only models currently loaded in the runner.
+        Pulled/available models are listed on the Environment page.
       </p>
       <div className="mb-4 bg-yellow-100 p-4 rounded">
         <strong>Optimizations in effect:</strong>
@@ -37,6 +41,13 @@ export default function OllamaStatus() {
       {error && <p className="text-red-600">Error: {error}</p>}
       {status ? (
         <div className="overflow-auto">
+          {status.model_source && (
+            <p className="mb-2 text-sm text-gray-600">
+              {status.model_source === "loaded"
+                ? "Showing currently loaded models from Ollama runner."
+                : "No models currently loaded in Ollama runner."}
+            </p>
+          )}
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr>
@@ -45,7 +56,7 @@ export default function OllamaStatus() {
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(status.models) &&
+              {Array.isArray(status.models) && status.models.length > 0 ? (
                 status.models.map((m: any, i: number) => {
                   let name = "";
                   let details = "";
@@ -53,7 +64,6 @@ export default function OllamaStatus() {
                     name = m;
                   } else if (m && typeof m === "object") {
                     name = m.name || m.model || JSON.stringify(m);
-                    // optionally show size or context_length
                     if (m.context_length) {
                       details = `ctx=${m.context_length}`;
                     } else if (m.size) {
@@ -66,7 +76,14 @@ export default function OllamaStatus() {
                       <td className="border px-2 py-1">{details}</td>
                     </tr>
                   );
-                })}
+                })
+              ) : (
+                <tr>
+                  <td className="border px-2 py-1 text-gray-600" colSpan={2}>
+                    No loaded models yet.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
           {status.timestamp && (
