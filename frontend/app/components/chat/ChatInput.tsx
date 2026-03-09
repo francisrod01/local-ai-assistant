@@ -13,28 +13,39 @@ interface Props {
 
 export default function ChatInput({ prompt, setPrompt, onSend, loading, cancelPrompt, retryAvailable, lastSentPrompt, onRetry }: Props) {
   return (
-    <div style={{ marginBottom: 10 }}>
+    <div className="mb-2">
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         placeholder="Type your message..."
         rows={3}
-        style={{ width: "100%", marginBottom: 10 }}
+        className="w-full mb-2 border rounded p-2"
       />
 
-      <div style={{ marginTop: 10 }}>
-        <button onClick={onSend} disabled={loading}>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <button
+          onClick={onSend}
+          disabled={loading}
+          className="px-3 py-1 rounded bg-blue-600 text-white disabled:opacity-50"
+        >
           {loading ? "Thinking..." : "Send"}
         </button>
 
         {loading && (
-          <button onClick={cancelPrompt} style={{ marginLeft: 10 }}>
+          <button
+            onClick={cancelPrompt}
+            className="px-3 py-1 rounded bg-gray-300"
+          >
             Cancel
           </button>
         )}
 
         {retryAvailable && (
-          <button onClick={onRetry} style={{ marginLeft: 10 }} disabled={!lastSentPrompt}>
+          <button
+            onClick={onRetry}
+            disabled={!lastSentPrompt}
+            className="px-3 py-1 rounded bg-gray-300 disabled:opacity-50"
+          >
             Retry
           </button>
         )}

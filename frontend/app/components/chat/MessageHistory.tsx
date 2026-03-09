@@ -11,23 +11,14 @@ interface Props {
 
 export default function MessageHistory({ history, loading, response, messagesEndRef }: Props) {
   return (
-    <div style={{ marginTop: 20 }}>
+    <div className="mt-5">
       {history.map((msg, idx) => (
         <ChatMessage key={idx} message={msg} />
       ))}
 
       {loading && (
-        <div style={{ textAlign: "left", margin: "8px 0" }}>
-          <span
-            style={{
-              display: "inline-block",
-              padding: "10px 14px",
-              borderRadius: 12,
-              backgroundColor: "#F1F0F0",
-              maxWidth: "80%",
-              whiteSpace: "pre-wrap",
-            }}
-          >
+        <div className="text-left my-2">
+          <span className="inline-block px-4 py-2 rounded-xl bg-gray-100 max-w-[80%] whitespace-pre-wrap">
             {response || "..."}
           </span>
         </div>
