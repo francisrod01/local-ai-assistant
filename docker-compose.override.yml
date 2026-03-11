@@ -11,6 +11,7 @@ services:
       DEBUG: 1
     # mount only the backend sources into /app
     volumes:
+      # - ${BACKEND_VOLUME_PATH}:/app/data
       - ../local-ai-assistant/backend:/app:cached
     ports:
       - "8000:8000"
@@ -32,6 +33,7 @@ services:
       - 5173
     # mount only the frontend sources so /app/package.json exists
     volumes:
+      # - ${FRONTEND_VOLUME_PATH}:/usr/src/app/data
       # mount the whole frontend tree; install dependencies locally so the
       # container can pick them up from the host
       - ../local-ai-assistant/frontend:/app:cached
@@ -57,7 +59,7 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ${PROMETHEUS_VOLUME_PATH:-prometheus-data}:/prometheus
+      - ${PROMETHEUS_VOLUME_PATH:-prometheus_data}:/prometheus
     depends_on:
       - backend
       - ollama
@@ -106,8 +108,8 @@ services:
       - "3100:3100"
     volumes:
       - ./loki/config.yaml:/etc/loki/local-config.yaml:ro
-      - ${LOKI_DATA_VOLUME_PATH:-loki-data}:/loki
-      - ${LOKI_DATA_VOLUME_PATH:-loki-data}:/wal
+      - ${LOKI_DATA_VOLUME_PATH:-loki_data}:/loki
+      - ${LOKI_DATA_VOLUME_PATH:-loki_data}:/wal
     command: -config.file=/etc/loki/local-config.yaml
 
   promtail:
