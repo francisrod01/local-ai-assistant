@@ -9,6 +9,8 @@ This project is a local AI chat assistant that runs as a multi-container stack:
 - Cache/state/rate limit: Redis
 - Observability: Prometheus + Grafana + Loki + Promtail
 
+<img src="screenshots/docker_containers.png" alt="Docker containers" width="600" />
+
 ## Features Covered in This Repo
 
 - Streaming and non-streaming chat endpoints (`/chat`, `/chat_stream`)
@@ -123,3 +125,38 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml config
 - First startup may be slow while Ollama images/models are initialized (`ollama-init`).
 - If backend can’t reach DB in containers, verify `BACKEND_POSTGRES_URL` host is `postgres`.
 - If you change compose envs, re-run `docker compose config` to verify final effective values.
+
+## Screenshots
+
+Once the stack is up you can visit the frontend at `http://localhost:5173`.
+
+1. **Home page**
+
+  <img src="screenshots/home_page.png" alt="Home page" width="600" />
+
+2. **Chat page**
+
+  <img src="screenshots/image_1.png" alt="Chat page" width="600" />
+
+3. **Ollama status page**
+
+  <img src="screenshots/ollama_status_page.png" alt="Ollama status" width="600" />
+
+4. **Insights page**
+
+  <img src="screenshots/insights_page.png" alt="Insights page" width="600" />
+
+5. **Environment page**
+
+  <img src="screenshots/env_page.png" alt="Environment page" width="800" />
+
+6. **Logs page**
+
+  <img src="screenshots/logs_page.png" alt="Logs page" width="800" />
+
+7. **Metrics page**
+
+  <!-- show multiple metrics images side-by-side -->
+  <img src="screenshots/metrics_page.png" alt="Metrics page" width="800" />
+  <img src="screenshots/metrics_1.png" alt="Metrics page 2" width="800" />
+  <img src="screenshots/metrics_2.png" alt="Metrics page 3" width="800" />
