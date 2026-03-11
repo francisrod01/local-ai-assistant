@@ -45,74 +45,70 @@ export default function ChatView({
   newConversation,
   lastSentPrompt,
 }: Props) {
+  // compute active conversation once so we can use it in several places
+  const activeConversation =
+    selectedConversationId !== null
+      ? savedConversations.find((c) => c.id === selectedConversationId)!
+      : null;
+
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: 24,
-        padding: "30px 20px 20px",
-        maxWidth: 1100,
-        margin: "auto",
-      }}
-    >
-      <SavedConversations
-        conversations={savedConversations}
-        selectedId={selectedConversationId}
-        onSelect={openConversation}
-        onNew={newConversation}
-        onClear={clearHistory}
-      />
+    <main className="pt-[30px] p-4 container mx-auto">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start">
+        <SavedConversations
+          conversations={savedConversations}
+          selectedId={selectedConversationId}
+          onSelect={openConversation}
+          onNew={newConversation}
+          onClear={clearHistory}
+        />
 
-      <main style={{ flex: 1 }}>
-        {!selectedConversationId && (
-          <>
-            <h2 style={{ marginTop: 0 }}>Chat with AI Assistant</h2>
+        <div className="flex-1">
+          <h2 className="mt-0 mb-6">Chat with AI Assistant</h2>
 
-            <ChatInput
-              prompt={prompt}
-              setPrompt={setPrompt}
-              onSend={handleSend}
-              loading={loading}
-              cancelPrompt={cancelPrompt}
-              retryAvailable={retryAvailable}
-              lastSentPrompt={lastSentPrompt}
-              onRetry={handleRetry}
-            />
+          {!selectedConversationId && (
+            <>
+              <ChatInput
+                prompt={prompt}
+                setPrompt={setPrompt}
+                onSend={handleSend}
+                loading={loading}
+                cancelPrompt={cancelPrompt}
+                retryAvailable={retryAvailable}
+                lastSentPrompt={lastSentPrompt}
+                onRetry={handleRetry}
+              />
 
-            {error && <div style={{ color: "red", marginTop: 8 }}>Error: {error}</div>}
-          </>
-        )}
+              {error && <div className="text-red-600 mt-2">Error: {error}</div>}
+            </>
+          )}
 
-        {selectedConversationId ? (
-          (() => {
-            const active = savedConversations.find((c) => c.id === selectedConversationId)!;
-            return (
-              <div>
-                <div style={{ marginTop: 8 }}>
-                  <strong>{active.title}</strong>
-                </div>
+          {selectedConversationId ? (
+            <div className="mt-2">
+              <MessageHistory
+                history={activeConversation!.messages}
+                loading={false}
+                response=""
+                messagesEndRef={messagesEndRef}
+              />
+            </div>
+          ) : (
+            <div className="mt-5">
+              {(() => {
+                const lastUser = [...history].reverse().find((m) => m.role === "user");
+                return lastUser ? <ChatMessage message={lastUser} /> : null;
+              })()}
 
-                <MessageHistory history={active.messages} loading={false} response={""} messagesEndRef={messagesEndRef} />
-              </div>
-            );
-          })()
-        ) : (
-          <div style={{ marginTop: 20 }}>
-            {(() => {
-              const lastUser = [...history].reverse().find((m) => m.role === "user");
-              return lastUser ? <ChatMessage message={lastUser} /> : null;
-            })()}
+              {loading ? (
+                <ChatMessage message={{ role: "assistant", content: response || "..." }} />
+              ) : (
+                response && <ChatMessage message={{ role: "assistant", content: response }} />
+              )}
 
-            {loading ? (
-              <ChatMessage message={{ role: "assistant", content: response || "..." }} />
-            ) : (
-              response && <ChatMessage message={{ role: "assistant", content: response }} />
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-        )}
-      </main>
-    </div>
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
   );
 }

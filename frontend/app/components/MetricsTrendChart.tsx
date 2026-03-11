@@ -36,11 +36,12 @@ export default function MetricsTrendChart({ data }: Props) {
           <YAxis allowDecimals={false} />
           <Tooltip
             labelFormatter={(
-              label: string | number,
-              payload: Array<{ payload: TrendPoint }>,
-            ) => {
-              if (payload && payload.length > 0) {
-                return payload[0].payload.timeFull;
+              label: any,
+              payload: any[],
+            ): React.ReactNode => {
+              if (payload && payload.length > 0 && payload[0].payload) {
+                // payload[0].payload should be TrendPoint when using our data
+                return (payload[0].payload as TrendPoint).timeFull;
               }
               return label;
             }}

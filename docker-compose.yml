@@ -17,7 +17,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ${REDISDATA_VOLUME_PATH:-redisdata}:/data
+      - ${REDISDATA_VOLUME_PATH:-redis_data}:/data
 
   loki:
     image: grafana/loki:latest
@@ -25,7 +25,7 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - ${LOKI_DATA_VOLUME_PATH:-loki-data}:/loki/data
+      - ${LOKI_DATA_VOLUME_PATH:-loki_data}:/loki/data
     command: -config.file=/etc/loki/local-config.yaml
 
   ollama:
@@ -34,7 +34,7 @@ services:
     ports:
       - "11434:11434"
     volumes:
-      - ${OLLAMA_VOLUME_PATH}:/root/.ollama
+      - ${OLLAMA_VOLUME_PATH:-ollama_data}:/root/.ollama
     restart: unless-stopped
     # persistently tune Ollama for minimal memory use across environments
     environment:
@@ -52,7 +52,7 @@ services:
     depends_on:
       - ollama
     volumes:
-      - ${OLLAMA_VOLUME_PATH}:/root/.ollama
+      - ${OLLAMA_VOLUME_PATH:-ollama_data}:/root/.ollama
     environment:
       OLLAMA_HOST: http://ollama:11434
     entrypoint: ["/bin/sh", "-c"]
@@ -68,7 +68,6 @@ services:
     build: ./backend
     container_name: local-ai-backend
     volumes:
-      - ${BACKEND_VOLUME_PATH}:/app/data
       # allow backend to talk to Docker daemon for log retrieval
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -98,7 +97,6 @@ services:
     container_name: local-ai-frontend
     working_dir: /app
     volumes:
-      - ${FRONTEND_VOLUME_PATH}:/usr/src/app/data
       - /app/node_modules # keep node_modules in container to avoid host/contests conflicts
     stdin_open: true
     tty: true
@@ -107,6 +105,7 @@ services:
 
 volumes:
   pgdata:
-  redisdata:
-  loki-data:
-  prometheus-data:
+  ollama_data:
+  redis_data:
+  loki_data:
+  prometheus_data:

@@ -9,16 +9,10 @@ export default function ChatMessage({ message }: Props) {
   const isUser = message.role === "user";
 
   return (
-    <div style={{ textAlign: isUser ? "right" : "left", margin: "8px 0" }}>
+    <div className={`${isUser ? "text-right" : "text-left"} my-2`}>
       <span
-        style={{
-          display: "inline-block",
-          padding: "10px 14px",
-          borderRadius: 12,
-          backgroundColor: isUser ? "#DCF8C6" : "#F1F0F0",
-          maxWidth: "80%",
-          whiteSpace: "pre-wrap",
-        }}
+        className={`inline-block px-4 py-2 rounded-xl max-w-[80%] whitespace-pre-wrap ${isUser ? "bg-green-100" : "bg-gray-100"
+          }`}
       >
         {message.content}
       </span>
