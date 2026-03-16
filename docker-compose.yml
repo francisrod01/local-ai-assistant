@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
     # persistently tune Ollama for minimal memory use across environments
     environment:
-      # keep only one resident model so phi3:mini stays loaded
+      # keep only one resident model resident in memory at a time
       OLLAMA_MAX_LOADED_MODELS: "1"
       # shrink default context length; frontend controls prompt size so 1‑2k is fine
       OLLAMA_CONTEXT_LENGTH: "1024"
@@ -55,14 +55,15 @@ services:
       - ${OLLAMA_VOLUME_PATH:-ollama_data}:/root/.ollama
     environment:
       OLLAMA_HOST: http://ollama:11434
+      OLLAMA_DEFAULT_MODEL: ${OLLAMA_DEFAULT_MODEL:-llama3.2:3b}
     entrypoint: ["/bin/sh", "-c"]
     command: >
       "until ollama list; do
          echo 'waiting for ollama...';
          sleep 5;
        done &&
-       ollama pull phi3:mini &&
-       ollama pull gemma:2b"
+       ollama pull ${OLLAMA_DEFAULT_MODEL:-llama3.2:3b} &&
+       ollama pull gemma2:2b"
 
   backend:
     build: ./backend
@@ -71,6 +72,7 @@ services:
       # allow backend to talk to Docker daemon for log retrieval
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
+      PYTHONPATH: /app
       POSTGRES_URL: ${BACKEND_POSTGRES_URL:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}}
       DATABASE_URL: ${BACKEND_POSTGRES_URL:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}}
       OLLAMA_URL: ${OLLAMA_URL}
@@ -80,6 +82,7 @@ services:
       OLLAMA_WARMUP_TIMEOUT_SECONDS: ${OLLAMA_WARMUP_TIMEOUT_SECONDS:-90}
       OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-15m}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      OLLAMA_DEFAULT_MODEL: ${OLLAMA_DEFAULT_MODEL:-llama3.2:3b}
       REDIS_CACHE_TTL_SECONDS: ${REDIS_CACHE_TTL_SECONDS:-3600}
       REDIS_SESSION_TTL_SECONDS: ${REDIS_SESSION_TTL_SECONDS:-86400}
       REDIS_STREAM_TTL_SECONDS: ${REDIS_STREAM_TTL_SECONDS:-300}
