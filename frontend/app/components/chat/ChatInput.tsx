@@ -15,7 +15,7 @@ export default function ChatInput({ prompt, setPrompt, onSend, loading, cancelPr
   const isSendDisabled = loading || !prompt.trim();
 
   return (
-    <div className="mb-2">
+    <div>
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}

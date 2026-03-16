@@ -7,7 +7,6 @@ interface Props {
   onSelect: (c: Conversation) => void;
   onDelete: (id: string) => void;
   onClear: () => void;
-  onNew: () => void; // start a fresh chat
 }
 
 export default function SavedConversations({
@@ -16,38 +15,14 @@ export default function SavedConversations({
   onSelect,
   onDelete,
   onClear,
-  onNew,
 }: Props) {
   return (
-    <aside className="w-64">
+    <div className="flex flex-col min-h-0 flex-1">
       <div className="flex items-center justify-between mb-3">
         <h3 className="mt-0">Conversations</h3>
-        <button
-          type="button"
-          aria-label="New conversation"
-          title="New conversation"
-          onClick={onNew}
-          className="p-1 rounded text-gray-700 hover:text-blue-600 cursor-pointer"
-        >
-          <svg
-            aria-hidden="true"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2" />
-            <line x1="18" y1="8" x2="18" y2="14" />
-            <line x1="15" y1="11" x2="21" y2="11" />
-          </svg>
-        </button>
       </div>
 
-      <div className="flex flex-col gap-2 max-h-[70vh] overflow-y-auto">
+      <div className="flex flex-col gap-2 md:flex-1 md:overflow-y-auto max-h-[70vh] md:max-h-none">
         {conversations.length === 0 && (
           <div className="text-gray-600 text-xs">No saved conversations yet — responses will appear here after streaming.</div>
         )}
@@ -114,6 +89,6 @@ export default function SavedConversations({
           </button>
         </div>
       )}
-    </aside>
+    </div>
   );
 }

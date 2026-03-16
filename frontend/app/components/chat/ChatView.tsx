@@ -1,5 +1,6 @@
 import React from "react";
 import ChatInput from "./ChatInput";
+import ChatSidebarHeader from "./ChatSidebarHeader";
 import MessageHistory from "./MessageHistory";
 import SavedConversations from "../SavedConversations";
 import type { Conversation } from "../types";
@@ -52,32 +53,21 @@ export default function ChatView({
   return (
     <main className="pt-[30px] p-4 container mx-auto">
       <div className="flex flex-col gap-3 md:flex-row md:items-start">
-        <SavedConversations
-          conversations={savedConversations}
-          selectedId={selectedConversationId}
-          onSelect={openConversation}
-          onNew={newConversation}
-          onClear={clearHistory}
-          onDelete={deleteConversation}
-        />
-
-        <div className="flex-1">
-          <h2 className="mt-0 mb-6">Chat with AI Assistant</h2>
-
-          <ChatInput
-            prompt={prompt}
-            setPrompt={setPrompt}
-            onSend={handleSend}
-            loading={loading}
-            cancelPrompt={cancelPrompt}
-            retryAvailable={retryAvailable}
-            lastSentPrompt={lastSentPrompt}
-            onRetry={handleRetry}
+        <aside className="w-full md:w-72 md:sticky md:top-4 md:self-start md:h-[calc(100vh-8.5rem)] flex flex-col">
+          <ChatSidebarHeader onNew={newConversation} />
+          <SavedConversations
+            conversations={savedConversations}
+            selectedId={selectedConversationId}
+            onSelect={openConversation}
+            onClear={clearHistory}
+            onDelete={deleteConversation}
           />
+        </aside>
 
-          {error && <div className="text-red-600 mt-2">Error: {error}</div>}
+        <div className="flex-1 min-h-[65vh] md:h-[calc(100vh-8.5rem)] border rounded-lg bg-white flex flex-col">
+          <div className="flex-1 overflow-y-auto p-4">
+            {error && <div className="text-red-600 mb-2">Error: {error}</div>}
 
-          <div className="mt-2">
             {activeConversation ? (
               <MessageHistory
                 history={activeConversation.messages}
@@ -90,6 +80,19 @@ export default function ChatView({
                 Start a new conversation, or select one from the left.
               </div>
             )}
+          </div>
+
+          <div className="border-t bg-white p-3">
+            <ChatInput
+              prompt={prompt}
+              setPrompt={setPrompt}
+              onSend={handleSend}
+              loading={loading}
+              cancelPrompt={cancelPrompt}
+              retryAvailable={retryAvailable}
+              lastSentPrompt={lastSentPrompt}
+              onRetry={handleRetry}
+            />
           </div>
         </div>
       </div>
