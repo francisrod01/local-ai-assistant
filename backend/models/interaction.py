@@ -8,6 +8,7 @@ class InteractionModel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user = Column(String, index=True)
+    conversation_id = Column(String, index=True, nullable=True)
     prompt = Column(Text, nullable=False)
     response = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)

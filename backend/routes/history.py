@@ -14,6 +14,7 @@ class InteractionCreate(BaseModel):
     prompt: str
     response: str
     user: str = "user_1"
+    conversation_id: str | None = None
 
 
 from pydantic import ConfigDict
@@ -23,6 +24,7 @@ class InteractionOut(BaseModel):
     prompt: str
     response: str
     user: str
+    conversation_id: str | None = None
     created_at: datetime
 
     # Pydantic v2 style config: `orm_mode` replaced by
@@ -40,7 +42,13 @@ def get_db():
 
 @router.post("/history", response_model=InteractionOut)
 def create_history_item(item: InteractionCreate, db: Session = Depends(get_db)):
-    inter = interaction.create_interaction(db, item.user, item.prompt, item.response)
+    inter = interaction.create_interaction(
+        db,
+        item.user,
+        item.prompt,
+        item.response,
+        item.conversation_id,
+    )
     return inter
 
 
@@ -61,6 +69,21 @@ def get_history_item(item_id: int, db: Session = Depends(get_db)):
     if not row:
         raise HTTPException(status_code=404, detail="Item not found")
     return row
+
+
+@router.delete("/history/conversation/{conversation_id}")
+def delete_history_conversation(conversation_id: str, db: Session = Depends(get_db)):
+    interaction.delete_interactions_by_conversation(db, conversation_id, "user_1")
+    return {"status": "ok"}
+
+
+@router.delete("/history/{item_id}")
+def delete_history_item(item_id: int, db: Session = Depends(get_db)):
+    row = interaction.get_interaction(db, item_id, "user_1")
+    if not row:
+        raise HTTPException(status_code=404, detail="Item not found")
+    interaction.delete_interaction(db, item_id, "user_1")
+    return {"status": "ok"}
 
 
 @router.delete("/history")
