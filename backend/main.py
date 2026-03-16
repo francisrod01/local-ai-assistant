@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
 import os
+from sqlalchemy import text
 
 # load environment variables from .env file (development)
 load_dotenv()
@@ -64,11 +65,40 @@ def _env_float(name: str, default: float) -> float:
 OLLAMA_WARMUP_TIMEOUT_SECONDS = _env_float("OLLAMA_WARMUP_TIMEOUT_SECONDS", 90.0)
 OLLAMA_KEEP_ALIVE = os.getenv("OLLAMA_KEEP_ALIVE", "15m")
 
+
+def _ensure_interactions_schema():
+    """Best-effort schema patch for older local DBs.
+
+    Existing deployments may have created `interactions` before conversation
+    threading existed, so we add `conversation_id` on startup.
+    """
+
+    try:
+        with engine.begin() as conn:
+            column_exists = conn.execute(
+                text(
+                    """
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_name = 'interactions'
+                      AND column_name = 'conversation_id'
+                    """
+                )
+            ).scalar()
+
+            if not column_exists:
+                conn.execute(text("ALTER TABLE interactions ADD COLUMN conversation_id VARCHAR"))
+    except Exception:
+        # Column likely already exists, or the database backend does not expose
+        # information_schema in the expected way. Keep startup resilient.
+        pass
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # use Base from db since that's where it is defined
     import db as _db
     _db.Base.metadata.create_all(bind=engine)
+    _ensure_interactions_schema()
 
     # warm up the default Ollama model so the first real user request doesn't
     # pay the cost of loading 2 GB into memory.  a short dummy generate call is
@@ -76,8 +106,8 @@ async def lifespan(app: FastAPI):
     # it resident.
     try:
         set_system_flag("model_warming_up", "1", ttl_seconds=180)
-        # we avoid importing routes.chat to prevent circular dependencies
-        model = "phi3:mini"
+        # read the same env var used by routes/chat.py, no circular import needed
+        model = os.getenv("OLLAMA_DEFAULT_MODEL", "llama3.2:3b")
         import requests
         requests.post(
             f"{os.getenv('OLLAMA_URL','http://ollama:11434')}/api/generate",

@@ -4,6 +4,7 @@ WORKDIR /app
 
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONPATH="/app"
 
 # upgrade pip to specified version before installing dependencies
 RUN pip install --upgrade pip==26.0.1

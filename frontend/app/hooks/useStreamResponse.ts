@@ -1,5 +1,16 @@
 import { useRef, useState } from "react";
 
+type ContextMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+type SendPromptOptions = {
+  user?: string;
+  conversationId?: string | null;
+  context?: ContextMessage[];
+};
+
 export function useStreamResponse() {
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
@@ -9,7 +20,7 @@ export function useStreamResponse() {
   const abortController = useRef<AbortController | null>(null);
 
 
-  const sendPrompt = async (prompt: string) => {
+  const sendPrompt = async (prompt: string, options?: SendPromptOptions) => {
     setLoading(true);
     setResponse("");
     setError(null);
@@ -21,7 +32,12 @@ export function useStreamResponse() {
       const res = await fetch("/chat_stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({
+          prompt,
+          user: options?.user ?? "user_1",
+          conversation_id: options?.conversationId ?? null,
+          context: options?.context ?? [],
+        }),
         signal: abortController.current.signal,
       });
 

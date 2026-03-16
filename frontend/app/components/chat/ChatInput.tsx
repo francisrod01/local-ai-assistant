@@ -12,8 +12,10 @@ interface Props {
 }
 
 export default function ChatInput({ prompt, setPrompt, onSend, loading, cancelPrompt, retryAvailable, lastSentPrompt, onRetry }: Props) {
+  const isSendDisabled = loading || !prompt.trim();
+
   return (
-    <div className="mb-2">
+    <div>
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
@@ -25,7 +27,7 @@ export default function ChatInput({ prompt, setPrompt, onSend, loading, cancelPr
       <div className="mt-2 flex flex-wrap gap-2">
         <button
           onClick={onSend}
-          disabled={loading}
+          disabled={isSendDisabled}
           className="px-3 py-1 rounded bg-blue-600 text-white disabled:opacity-50"
         >
           {loading ? "Thinking..." : "Send"}

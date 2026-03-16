@@ -26,7 +26,7 @@ def test_counters_increment_on_chat(monkeypatch):
         return R()
     monkeypatch.setattr("routes.chat.requests.get", fake_ps)
 
-    client.post("/chat", json={"prompt": "hello"})
+    client.post("/chat", json={"prompt": "hello", "user": "test_metrics_user"})
 
     # after request, metrics should show tokens counter >0 and ollama counters
     resp = client.get("/metrics")
