@@ -136,7 +136,7 @@ Once the stack is up you can visit the frontend at `http://localhost:5173`.
 
 2. **Chat page**
 
-  <img src="screenshots/image_1.png" alt="Chat page" width="600" />
+  <img src="screenshots/copilot_chat_style.png" alt="Chat page" width="600" />
 
 3. **Ollama status page**
 
