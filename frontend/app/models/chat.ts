@@ -1,10 +1,7 @@
 import type { RefObject } from "react";
-import type { Message, Conversation } from "../types";
-
-export type { Message, Conversation };
+import type { Conversation } from "../components/types";
 
 export interface ChatViewProps {
-  messagesEndRef: RefObject<HTMLDivElement | null>;
   prompt: string;
   setPrompt: (v: string) => void;
   savedConversations: Conversation[];
@@ -14,6 +11,7 @@ export interface ChatViewProps {
   error: string | null;
   retryAvailable: boolean;
   cancelPrompt: () => void;
+  messagesEndRef: RefObject<HTMLDivElement | null>;
   handleSend: () => void;
   handleRetry: () => void;
   openConversation: (c: Conversation) => void;
@@ -21,15 +19,4 @@ export interface ChatViewProps {
   clearHistory: () => Promise<void>;
   newConversation: () => void;
   lastSentPrompt: string | null;
-}
-
-export interface ChatInputProps {
-  prompt: string;
-  setPrompt: (v: string) => void;
-  onSend: () => void;
-  loading: boolean;
-  cancelPrompt: () => void;
-  retryAvailable: boolean;
-  lastSentPrompt: string | null;
-  onRetry: () => void;
 }

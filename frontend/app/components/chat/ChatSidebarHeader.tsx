@@ -21,7 +21,7 @@ export default function ChatSidebarHeader({ onNew }: Props) {
         aria-label="New conversation"
         title="New conversation"
         onClick={onNew}
-        className="inline-flex items-center gap-2 px-2 py-1 rounded border border-gray-200 text-gray-700 hover:text-blue-600 hover:border-blue-200 cursor-pointer text-sm"
+        className="inline-flex items-center gap-2 px-2 py-1 rounded bg-gray-100 text-gray-700 hover:text-blue-600 hover:bg-gray-200 cursor-pointer text-sm"
       >
         <svg
           aria-hidden="true"
