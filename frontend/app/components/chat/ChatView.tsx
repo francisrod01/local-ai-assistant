@@ -58,7 +58,7 @@ export default function ChatView(props: ChatViewProps) {
         <div className="relative flex-1 h-[calc(100vh-8.5rem)] bg-white rounded-xl shadow-sm ring-1 ring-black/10 flex flex-col">
           <div
             ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto p-3"
+            className="relative flex-1 overflow-y-auto p-3"
           >
             {error && <div className="text-red-600 mb-2">Error: {error}</div>}
 
@@ -74,32 +74,32 @@ export default function ChatView(props: ChatViewProps) {
                 Start a new conversation, or select one from the left.
               </div>
             )}
+
+            {showScrollToBottom && (
+              <button
+                type="button"
+                onClick={scrollToBottom}
+                className="sticky bottom-4 left-1/2 -translate-x-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white shadow ring-1 ring-black/10 text-gray-600 hover:bg-gray-50 cursor-pointer z-10"
+                aria-label="Scroll to newest"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 5v14" />
+                  <path d="M19 12l-7 7-7-7" />
+                </svg>
+              </button>
+            )}
           </div>
 
-          {showScrollToBottom && (
-            <button
-              type="button"
-              onClick={scrollToBottom}
-              className="absolute bottom-20 left-1/2 -translate-x-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white shadow ring-1 ring-black/10 text-gray-600 hover:bg-gray-50 cursor-pointer z-10"
-              aria-label="Scroll to newest"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 5v14" />
-                <path d="M19 12l-7 7-7-7" />
-              </svg>
-            </button>
-          )}
-
-          <div className="bg-white p-2">
+          <div className="bg-white p-3">
             <ChatInput
               prompt={prompt}
               setPrompt={setPrompt}

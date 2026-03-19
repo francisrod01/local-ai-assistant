@@ -36,7 +36,7 @@ export default function ChatInput({
   );
 
   return (
-    <div className="relative rounded-xl bg-white/80 shadow-sm ring-1 ring-gray-200 p-4">
+    <div className="relative rounded-xl bg-white/80 shadow-lg p-4 transition-shadow duration-200 focus-within:shadow-2xl focus-within:ring-2 focus-within:ring-blue-300 focus-within:ring-offset-2 focus-within:ring-offset-white">
       <textarea
         ref={textareaRef}
         value={prompt}
@@ -44,7 +44,7 @@ export default function ChatInput({
         onKeyDown={handleKeyDown}
         placeholder="Type your message..."
         rows={1}
-        className="w-full mb-3 resize-none overflow-y-auto rounded-lg p-3 bg-white/70 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-200"
+        className="w-full mb-3 resize-none overflow-y-auto rounded-xl p-3 bg-white shadow-sm focus:outline-none focus:ring-0"
       />
 
       <div className="flex items-center justify-between">

@@ -34,9 +34,10 @@ export default function SavedConversations({
             key={c.id}
             onClick={() => onSelect(c)}
             onMouseLeave={() => setOpenMenuId(null)}
-            className={`group relative p-2 rounded-lg cursor-pointer bg-white hover:bg-gray-50 ${
-              selectedId === c.id ? "bg-blue-50" : ""
-            }`}
+            className={`group relative p-2 rounded-xl cursor-pointer bg-white hover:bg-gray-50 ${selectedId === c.id
+              ? "bg-blue-50 shadow-sm before:absolute before:left-0 before:top-0 before:h-full before:w-1 before:rounded-l-xl before:bg-blue-500"
+              : ""
+              }`}
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
