@@ -62,3 +62,13 @@ If you run frontend directly on host, you must either:
 
 - run the app inside Compose (recommended), or
 - adjust proxy targets to `http://localhost:8000` for host-based development.
+
+## VS Code Recommended Extensions
+
+For the best local developer experience, install these extensions:
+
+- `esbenp.prettier-vscode`
+- `bradlc.vscode-tailwindcss`
+- `EditorConfig.EditorConfig`
+
+These are also included in `.vscode/extensions.json` for workspace recommendations.

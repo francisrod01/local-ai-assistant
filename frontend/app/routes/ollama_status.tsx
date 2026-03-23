@@ -24,7 +24,7 @@ export default function OllamaStatus() {
   }, []);
 
   return (
-    <main className="pt-[30px] p-4 container mx-auto">
+    <main className="pt-7.5 p-4 container mx-auto">
       <PageHeader
         title="Ollama Status"
         description="Displays the current models loaded into the Ollama runner for health checks and operational monitoring."

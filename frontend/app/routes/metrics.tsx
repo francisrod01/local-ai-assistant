@@ -165,7 +165,7 @@ export default function MetricsPage() {
   );
 
   return (
-    <main className="pt-[30px] p-4 container mx-auto">
+    <main className="pt-7.5 p-4 container mx-auto">
       <PageHeader
         title="Backend Metrics"
         description="Telemetry snapshot from backend, LLM, and vector operations. Prometheus internals (e.g. _created series) are excluded."

@@ -44,7 +44,7 @@ export default function LogsPage() {
   }, [importantOnly]);
 
   return (
-    <main className="pt-[30px] p-4 container mx-auto">
+    <main className="pt-7.5 p-4 container mx-auto">
       <PageHeader
         title="Ollama Logs"
         description="Log view with shared logo/branding, consistent with the other pages."

@@ -26,7 +26,7 @@ export default function EnvironmentPage() {
   }, []);
 
   return (
-    <main className="pt-[30px] p-4 container mx-auto">
+    <main className="pt-7.5 p-4 container mx-auto">
       <PageHeader
         title="Ollama Environment"
         description="Shows the configuration environment variables used by the Ollama service."

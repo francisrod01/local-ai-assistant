@@ -19,7 +19,7 @@ export default function InsightsPage() {
   }, []);
 
   return (
-    <main className="pt-[30px] p-4 container mx-auto">
+    <main className="pt-7.5 p-4 container mx-auto">
       <PageHeader
         title="Interaction Insights"
         description="A snapshot of aggregated chat usage and analytics."
