@@ -216,7 +216,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 # IDEs and editors
-.vscode/
+#.vscode/   # disabled so team-shared VS Code settings are tracked
 .idea/
 *.sublime-project
 *.sublime-workspace
