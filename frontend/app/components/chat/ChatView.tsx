@@ -43,11 +43,7 @@ export default function ChatView(props: ChatViewProps) {
   });
 
   return (
-    <main className="pt-[30px] p-4 container mx-auto">
-      <PageHeader
-        title="Chat with AI Assistant"
-        description="Interact with the assistant using the shared logo block commonly used on other pages."
-      />
+    <main className="pt-7.5 p-4 container mx-auto">
       <div className="flex flex-col gap-3 md:flex-row md:items-start">
         <aside className="w-full md:w-72 md:sticky md:top-4 md:self-start md:h-[calc(100vh-8.5rem)] flex flex-col">
           <ChatSidebarHeader onNew={newConversation} />

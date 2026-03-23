@@ -106,6 +106,9 @@ export function useChat() {
         );
 
         setSavedConversations(conversations);
+        if (conversations.length > 0) {
+          setSelectedConversationId(conversations[0].id);
+        }
       } catch (err) {
         console.error("could not load conversation history", err);
       }
