@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
+
+import { createPageTitle } from "../utils/meta";
 import VariableTable from "../components/environment/VariableTable";
+import PageHeader from "../components/PageHeader";
+
+export function meta() {
+  return createPageTitle("Environment");
+}
 
 export default function EnvironmentPage() {
   const [env, setEnv] = useState<any>(null);
@@ -20,13 +27,10 @@ export default function EnvironmentPage() {
 
   return (
     <main className="pt-[30px] p-4 container mx-auto">
-      <h2>Ollama Environment</h2>
-      <p className="mb-4 text-sm text-gray-600">
-        Shows the configuration environment variables used by the Ollama
-        service (OLLAMA_*), along with PATH/HOME, currently loaded models
-        (`models`), and all pulled models available in Ollama (`all_models`).
-        Useful for verifying that tuning variables are set correctly.
-      </p>
+      <PageHeader
+        title="Ollama Environment"
+        description="Shows the configuration environment variables used by the Ollama service."
+      />
       {runtimeSettings && (
         <section className="mb-4 rounded border p-3">
           <h3 className="mb-2 font-medium">Runtime Settings</h3>

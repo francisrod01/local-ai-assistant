@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
 
+import { createPageTitle } from "../utils/meta";
+import PageHeader from "../components/PageHeader";
+
+export function meta() {
+  return createPageTitle("Logs");
+}
+
 export default function LogsPage() {
   const [lines, setLines] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -38,11 +45,14 @@ export default function LogsPage() {
 
   return (
     <main className="pt-[30px] p-4 container mx-auto">
-      <h2>Ollama Logs</h2>
+      <PageHeader
+        title="Ollama Logs"
+        description="Log view with shared logo/branding, consistent with the other pages."
+      />
       <p className="mb-4 text-sm text-gray-600">
         Displays model-relevant lines from the Ollama container's log (via
         <code>docker logs</code>), while suppressing noisy polling entries like
-        <code>/api/ps</code>. Helpful when diagnosing model loads, warnings,
+        <code>/api/ps</code>.<br />Helpful when diagnosing model loads, warnings,
         errors, and generation behavior.
       </p>
       {error && <p className="text-red-600">Error: {error}</p>}

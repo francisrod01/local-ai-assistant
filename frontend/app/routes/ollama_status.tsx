@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
 
+import { createPageTitle } from "../utils/meta";
+import PageHeader from "../components/PageHeader";
+
+export function meta() {
+  return createPageTitle("Ollama Status");
+}
+
 export default function OllamaStatus() {
   const [status, setStatus] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -18,12 +25,10 @@ export default function OllamaStatus() {
 
   return (
     <main className="pt-[30px] p-4 container mx-auto">
-      <h2>Ollama Status</h2>
-      <p className="mb-4 text-sm text-gray-600">
-        Displays the current models loaded into the Ollama runner along with a
-        timestamp. This page is intended for quick health checks and monitoring
-        which model is actively resident in memory.
-      </p>
+      <PageHeader
+        title="Ollama Status"
+        description="Displays the current models loaded into the Ollama runner for health checks and operational monitoring."
+      />
       <p className="mb-4 text-sm text-gray-600">
         Note: this page shows only models currently loaded in the runner.
         Pulled/available models are listed on the Environment page.
