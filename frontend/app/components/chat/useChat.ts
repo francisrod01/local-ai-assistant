@@ -60,7 +60,7 @@ export function useChat() {
   useEffect(() => {
     async function loadHistory() {
       try {
-        const res = await fetch("/history");
+        const res = await fetch("/api/history");
         if (!res.ok) throw new Error("failed to fetch history");
         const data: InteractionOut[] = await res.json();
         const grouped = new Map<string, InteractionOut[]>();
@@ -221,7 +221,7 @@ export function useChat() {
 
   const clearHistory = async () => {
     try {
-      await fetch("/history", { method: "DELETE" });
+      await fetch("/api/history", { method: "DELETE" });
     } catch (err) {
       console.error("failed to clear history", err);
     }
@@ -252,8 +252,8 @@ export function useChat() {
 
     try {
       const endpoint = id.startsWith("legacy-")
-        ? `/history/${target.interactionIds[0]}`
-        : `/history/conversation/${encodeURIComponent(id)}`;
+        ? `/api/history/${target.interactionIds[0]}`
+        : `/api/history/conversation/${encodeURIComponent(id)}`;
       const res = await fetch(endpoint, { method: "DELETE" });
       if (!res.ok) throw new Error("failed to delete conversation");
     } catch (err) {
