@@ -38,12 +38,12 @@ Then update `.env` values as needed:
 
 - `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`
 - `OLLAMA_VOLUME_PATH`, `BACKEND_VOLUME_PATH`, `FRONTEND_VOLUME_PATH`
-- optional: `BACKEND_POSTGRES_URL`, Redis TTL/rate-limit envs
+- optional: Redis TTL/rate-limit envs
 
 Notes:
 
-- For container-to-container DB access, backend uses `BACKEND_POSTGRES_URL` (host `postgres`).
-- `POSTGRES_URL` is intended for host-side tooling.
+- For container-to-container DB access, backend uses `POSTGRES_URL` (host `postgres` in compose).
+- `POSTGRES_URL` is also used for local host-side tooling.
 - Keeping `REDISDATA_VOLUME_PATH` empty uses Docker named volume (safer on macOS permissions).
 
 ## Development (Single Command)
@@ -123,7 +123,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml config
 ## Troubleshooting
 
 - First startup may be slow while Ollama images/models are initialized (`ollama-init`).
-- If backend can’t reach DB in containers, verify `BACKEND_POSTGRES_URL` host is `postgres`.
+- If backend can’t reach DB in containers, verify `POSTGRES_URL` host is `postgres` (when using compose).
 - If you change compose envs, re-run `docker compose config` to verify final effective values.
 
 ## Screenshots

@@ -15,14 +15,21 @@ export type InteractionOut = {
 
 export function useChat() {
   const [prompt, setPrompt] = useState("");
-  const [savedConversations, setSavedConversations] = useState<Conversation[]>([]);
+  const [savedConversations, setSavedConversations] = useState<Conversation[]>(
+    [],
+  );
 
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
-  const [pendingConversationId, setPendingConversationId] = useState<string | null>(null);
+  const [pendingConversationId, setPendingConversationId] = useState<
+    string | null
+  >(null);
   const [lastSentPrompt, setLastSentPrompt] = useState<string | null>(null);
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [selectedConversationId, setSelectedConversationId] = useState<
+    string | null
+  >(null);
 
-  const { response, loading, error, retryAvailable, sendPrompt, cancelPrompt } = useStreamResponse();
+  const { response, loading, error, retryAvailable, sendPrompt, cancelPrompt } =
+    useStreamResponse();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const shortText = (text: string, maxLen: number) => {
@@ -35,7 +42,8 @@ export function useChat() {
   const summarizeConversation = (messages: Message[]) => {
     const userMessages = messages.filter((m) => m.role === "user");
     const firstQuestion = userMessages[0]?.content ?? "Untitled";
-    const latestQuestion = userMessages[userMessages.length - 1]?.content ?? firstQuestion;
+    const latestQuestion =
+      userMessages[userMessages.length - 1]?.content ?? firstQuestion;
     const turns = userMessages.length;
 
     return {
@@ -57,63 +65,75 @@ export function useChat() {
     });
   };
 
-  useEffect(() => {
-    async function loadHistory() {
-      try {
-        const res = await fetch("/api/history");
-        if (!res.ok) throw new Error("failed to fetch history");
-        const data: InteractionOut[] = await res.json();
-        const grouped = new Map<string, InteractionOut[]>();
+  const loadHistory = async () => {
+    try {
+      const res = await fetch("/api/history");
+      if (!res.ok) throw new Error("failed to fetch history");
+      const data: InteractionOut[] = await res.json();
+      const grouped = new Map<string, InteractionOut[]>();
 
-        for (const item of data) {
-          const key = item.conversation_id || `legacy-${item.id}`;
-          const list = grouped.get(key);
-          if (list) {
-            list.push(item);
-          } else {
-            grouped.set(key, [item]);
-          }
+      for (const item of data) {
+        const key = item.conversation_id || `legacy-${item.id}`;
+        const list = grouped.get(key);
+        if (list) {
+          list.push(item);
+        } else {
+          grouped.set(key, [item]);
         }
+      }
 
-        const conversations: Conversation[] = [];
+      const conversations: Conversation[] = [];
 
-        for (const [conversationId, rows] of grouped.entries()) {
-          const sortedRows = [...rows].sort(
-            (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-          );
+      for (const [conversationId, rows] of grouped.entries()) {
+        const sortedRows = [...rows].sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+        );
 
-          const messages: Message[] = [];
-          for (const row of sortedRows) {
-            messages.push({ role: "user", content: row.prompt, createdAt: row.created_at });
-            messages.push({ role: "assistant", content: row.response, createdAt: row.created_at });
-          }
-
-          const summary = summarizeConversation(messages);
-          const latestCreatedAt = sortedRows[sortedRows.length - 1]?.created_at ?? new Date().toISOString();
-
-          conversations.push({
-            id: conversationId,
-            title: summary.title,
-            description: summary.description,
-            messages,
-            interactionIds: sortedRows.map((r) => r.id),
-            updatedAt: latestCreatedAt,
+        const messages: Message[] = [];
+        for (const row of sortedRows) {
+          messages.push({
+            role: "user",
+            content: row.prompt,
+            createdAt: row.created_at,
+          });
+          messages.push({
+            role: "assistant",
+            content: row.response,
+            createdAt: row.created_at,
           });
         }
 
-        conversations.sort(
-          (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-        );
+        const summary = summarizeConversation(messages);
+        const latestCreatedAt =
+          sortedRows[sortedRows.length - 1]?.created_at ??
+          new Date().toISOString();
 
-        setSavedConversations(conversations);
-        if (conversations.length > 0) {
-          setSelectedConversationId(conversations[0].id);
-        }
-      } catch (err) {
-        console.error("could not load conversation history", err);
+        conversations.push({
+          id: conversationId,
+          title: summary.title,
+          description: summary.description,
+          messages,
+          interactionIds: sortedRows.map((r) => r.id),
+          updatedAt: latestCreatedAt,
+        });
       }
-    }
 
+      conversations.sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      );
+
+      setSavedConversations(conversations);
+      if (conversations.length > 0) {
+        setSelectedConversationId(conversations[0].id);
+      }
+    } catch (err) {
+      console.error("could not load conversation history", err);
+    }
+  };
+
+  useEffect(() => {
     loadHistory();
   }, []);
 
@@ -121,12 +141,19 @@ export function useChat() {
     const trimmedPrompt = prompt.trim();
     if (!trimmedPrompt || loading) return;
 
-    const conversationId = selectedConversationId || `conv-${crypto.randomUUID()}`;
-    const existingConversation = savedConversations.find((c) => c.id === conversationId);
+    const conversationId =
+      selectedConversationId || `conv-${crypto.randomUUID()}`;
+    const existingConversation = savedConversations.find(
+      (c) => c.id === conversationId,
+    );
     const existingMessages = existingConversation?.messages ?? [];
     const createdAt = new Date().toISOString();
 
-    const userMsg: Message = { role: "user", content: trimmedPrompt, createdAt };
+    const userMsg: Message = {
+      role: "user",
+      content: trimmedPrompt,
+      createdAt,
+    };
     const nextMessages = [...existingMessages, userMsg];
     const summary = summarizeConversation(nextMessages);
 
@@ -161,7 +188,11 @@ export function useChat() {
       };
       upsertConversation(pendingConversationId, (existing) => {
         const baseMessages = existing?.messages ?? [
-          { role: "user", content: pendingPrompt, createdAt: new Date().toISOString() },
+          {
+            role: "user",
+            content: pendingPrompt,
+            createdAt: new Date().toISOString(),
+          },
         ];
         const nextMessages = [...baseMessages, assistantMsg];
         const summary = summarizeConversation(nextMessages);
@@ -178,6 +209,9 @@ export function useChat() {
 
       setPendingPrompt(null);
       setPendingConversationId(null);
+
+      // refresh saved-conversations from backend, so the sidebar matches persisted history.
+      loadHistory();
     }
   }, [loading, response, pendingPrompt, pendingConversationId]);
 
@@ -189,8 +223,11 @@ export function useChat() {
     if (!lastSentPrompt) return;
     if (loading) return;
 
-    const conversationId = selectedConversationId || `conv-${crypto.randomUUID()}`;
-    const existingConversation = savedConversations.find((c) => c.id === conversationId);
+    const conversationId =
+      selectedConversationId || `conv-${crypto.randomUUID()}`;
+    const existingConversation = savedConversations.find(
+      (c) => c.id === conversationId,
+    );
     const existingMessages = existingConversation?.messages ?? [];
     const userMsg: Message = {
       role: "user",

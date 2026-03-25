@@ -50,7 +50,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 Environment notes:
 
-- If `DATABASE_URL`/`POSTGRES_URL` is not set, backend falls back to local SQLite (`data/local.db`).
+- If `POSTGRES_URL` is not set, backend falls back to local SQLite (`data/local.db`).
 - For Ollama on host, set:
 
 ```bash
