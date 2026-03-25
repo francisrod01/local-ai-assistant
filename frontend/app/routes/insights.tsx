@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
 
+import { createPageTitle } from "../utils/meta";
+import PageHeader from "../components/PageHeader";
+
+export function meta() {
+  return createPageTitle("Insights");
+}
+
 export default function InsightsPage() {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -12,12 +19,11 @@ export default function InsightsPage() {
   }, []);
 
   return (
-    <main className="pt-[30px] p-4 container mx-auto">
-      <h2>Interaction Insights</h2>
-      <p className="mb-4 text-sm text-gray-600">
-        Aggregated summary of chat history: counts, frequent prompt terms, and
-        average response length.
-      </p>
+    <main className="pt-7.5 p-4 container mx-auto">
+      <PageHeader
+        title="Interaction Insights"
+        description="A snapshot of aggregated chat usage and analytics."
+      />
       {error && <p className="text-red-600">Error: {error}</p>}
       {data ? (
         <div className="space-y-4">

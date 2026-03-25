@@ -7,13 +7,11 @@ interface Props {
 export default function ChatSidebarHeader({ onNew }: Props) {
   return (
     <div className="mb-3">
-      <div className="flex items-center gap-2 mb-2">
-        <img
-          src="/favicon.ico"
-          alt="Local AI Assistant logo"
-          className="w-5 h-5 rounded-sm"
-        />
-        <h2 className="m-0 text-base font-semibold">Chat with AI Assistant</h2>
+      <div className="mb-2">
+        <h2 className="text-base font-semibold">Chat with AI Assistant</h2>
+        <p className="text-xs text-gray-500">
+          Smart chat area: fully integrated with task history and assistant memory.
+        </p>
       </div>
 
       <button
@@ -21,7 +19,7 @@ export default function ChatSidebarHeader({ onNew }: Props) {
         aria-label="New conversation"
         title="New conversation"
         onClick={onNew}
-        className="inline-flex items-center gap-2 px-2 py-1 rounded border border-gray-200 text-gray-700 hover:text-blue-600 hover:border-blue-200 cursor-pointer text-sm"
+        className="inline-flex items-center gap-2 px-2 py-1 rounded bg-gray-100 text-gray-700 hover:text-blue-600 hover:bg-gray-200 cursor-pointer text-sm"
       >
         <svg
           aria-hidden="true"

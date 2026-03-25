@@ -17,12 +17,13 @@ services:
     build: ./frontend
     environment:
       NODE_ENV: production
+      PORT: 3000
     # In production we expect front-end to be built (served by nginx or similar);
     # the application is fronted by nginx, so there's no need to map host ports here.
     # ports:
     #   - "3000:3000"
     restart: unless-stopped
-    command: ["npm", "run", "start"] # runs react-router-serve
+    command: ["npm", "run", "start", "--", "--host", "0.0.0.0", "--port", "3000"] # runs react-router-serve
     expose:
       - 3000
 

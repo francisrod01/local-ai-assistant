@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
+
+import { createPageTitle } from "../utils/meta";
 import { parseMetrics, type MetricEntry } from "../components/metricsParser";
 import MetricsTable from "../components/MetricsTable";
 import MetricsChart from "../components/MetricsChart";
 import MetricsTrendChart from "../components/MetricsTrendChart";
 import ViewToggle from "../components/ViewToggle";
+import PageHeader from "../components/PageHeader";
+
+export function meta() {
+  return createPageTitle("Metrics");
+}
 
 function formatNumber(value: number): string {
   if (!Number.isFinite(value)) return "—";
@@ -158,13 +165,11 @@ export default function MetricsPage() {
   );
 
   return (
-    <main className="pt-[30px] p-4 container mx-auto">
-      <h2>Backend Metrics</h2>
-      <p className="mb-4 text-sm text-gray-600">
-        Business-focused telemetry snapshot from backend, LLM usage, and vector
-        knowledge operations. Technical Prometheus internals (for example
-        <code>_created</code> series) are excluded from this view.
-      </p>
+    <main className="pt-7.5 p-4 container mx-auto">
+      <PageHeader
+        title="Backend Metrics"
+        description="Telemetry snapshot from backend, LLM, and vector operations. Prometheus internals (e.g. _created series) are excluded."
+      />
       <p className="mb-4 text-sm text-gray-600">
         Last updated: {lastUpdated ? lastUpdated.toLocaleString() : "Loading..."}
       </p>

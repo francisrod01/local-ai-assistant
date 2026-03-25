@@ -11,18 +11,22 @@ export default function ChatMessage({ message }: Props) {
   const timestamp = formatChatTimestamp(message.createdAt);
 
   return (
-    <div className={`${isUser ? "text-right" : "text-left"} my-3`}>
-      <div
-        className={`text-[11px] text-gray-500 mb-1 ${isUser ? "text-right pr-1" : "text-left pl-1"}`}
-      >
-        {timestamp}
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"} my-2`}>
+      <div className="max-w-[75%]">
+        <div
+          className={`text-[11px] mb-1 ${isUser ? "text-right text-gray-500" : "text-left text-gray-500"}`}
+        >
+          {timestamp}
+        </div>
+        <div
+          className={`rounded-2xl px-4 py-3 whitespace-pre-wrap break-words shadow-sm ${isUser
+              ? "bg-blue-600 text-white"
+              : "bg-white/80 text-slate-900"
+            }`}
+        >
+          {message.content}
+        </div>
       </div>
-      <span
-        className={`inline-block px-4 py-2 rounded-xl max-w-[80%] whitespace-pre-wrap ${isUser ? "bg-green-100" : "bg-gray-100"
-          }`}
-      >
-        {message.content}
-      </span>
     </div>
   );
 }

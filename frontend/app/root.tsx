@@ -35,6 +35,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/logo-icon.svg" type="image/svg+xml" />
+        <link rel="shortcut icon" href="/logo-icon.svg" type="image/svg+xml" />
         <Meta />
         <Links />
       </head>
@@ -52,10 +54,13 @@ export default function App() {
   const isLanding = location.pathname === "/";
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       {!isLanding && <Header />}
-      <Outlet />
-    </>
+
+      <main className="flex-1 overflow-hidden">
+        <Outlet />
+      </main>
+    </div>
   );
 }
 
@@ -76,7 +81,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-[30px] p-4 container mx-auto">
+    <main className="pt-7.5 p-4 container mx-auto">
       <h1>{message}</h1>
       <p>{details}</p>
       {stack && (

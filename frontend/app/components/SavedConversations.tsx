@@ -16,6 +16,8 @@ export default function SavedConversations({
   onDelete,
   onClear,
 }: Props) {
+  const [openMenuId, setOpenMenuId] = React.useState<string | null>(null);
+
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <div className="flex items-center justify-between mb-3">
@@ -31,30 +33,33 @@ export default function SavedConversations({
           <div
             key={c.id}
             onClick={() => onSelect(c)}
-            className={`border p-2 rounded-lg cursor-pointer bg-white ${selectedId === c.id ? "border-2 border-gray-300" : "border"
+            onMouseLeave={() => setOpenMenuId(null)}
+            className={`group relative p-2 rounded-xl cursor-pointer bg-white hover:bg-gray-50 ${selectedId === c.id
+              ? "bg-blue-50 shadow-sm before:absolute before:left-0 before:top-0 before:h-full before:w-1 before:rounded-l-xl before:bg-blue-500"
+              : ""
               }`}
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-xs mb-1">{c.title}</div>
               </div>
+
               <div className="flex items-center shrink-0">
                 <button
                   type="button"
-                  aria-label="Delete conversation"
-                  title="Delete conversation"
+                  aria-label="Conversation options"
+                  title="Conversation options"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (window.confirm("Delete this conversation?")) {
-                      onDelete(c.id);
-                    }
+                    setOpenMenuId((prev) => (prev === c.id ? null : c.id));
                   }}
-                  className="text-gray-400 hover:text-red-600"
+                  className="opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-md bg-transparent p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
                 >
+                  <span className="sr-only">Open conversation menu</span>
                   <svg
                     aria-hidden="true"
-                    width="16"
-                    height="16"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -62,13 +67,31 @@ export default function SavedConversations({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <polyline points="3 6 5 6 21 6" />
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                    <path d="M10 11v6" />
-                    <path d="M14 11v6" />
-                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                    <circle cx="12" cy="12" r="1" />
+                    <circle cx="19" cy="12" r="1" />
+                    <circle cx="5" cy="12" r="1" />
                   </svg>
                 </button>
+
+                {openMenuId === c.id && (
+                  <div
+                    className="absolute right-2 top-10 z-10 w-36 rounded-lg bg-white shadow-lg ring-1 ring-black/10"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenMenuId(null);
+                        if (window.confirm("Delete this conversation?")) {
+                          onDelete(c.id);
+                        }
+                      }}
+                      className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Delete conversation
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

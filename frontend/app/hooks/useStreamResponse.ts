@@ -29,7 +29,7 @@ export function useStreamResponse() {
     abortController.current = new AbortController();
 
     try {
-      const res = await fetch("/chat_stream", {
+      const res = await fetch("/api/chat_stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

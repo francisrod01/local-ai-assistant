@@ -24,49 +24,26 @@ function ignoreWellKnownPlugin() {
 }
 
 export default defineConfig({
-  plugins: [ignoreWellKnownPlugin(), tailwindcss(), reactRouter(), tsconfigPaths()],
+  plugins: [
+    ignoreWellKnownPlugin(),
+    tailwindcss(),
+    reactRouter(),
+    tsconfigPaths(),
+  ],
   server: {
     proxy: {
-      "/chat_stream": {
+      "/api/chat_stream": {
         target: "http://backend:8000",
         changeOrigin: true,
         secure: false,
         ws: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
-      "/chat": {
+      "/api/chat": {
         target: "http://backend:8000",
         changeOrigin: true,
         secure: false,
-        // only proxy non-GET requests; allow frontend dev server to serve the
-        // React page for GET so the client-side router can render.
-        // Vite's types expect the Node IncomingMessage signature, so we
-        // relax to `any` to avoid the false-positive error shown by
-        // `npm run typecheck`.
-        bypass: (req: any) => {
-          if (req.method === "GET") {
-            return req.url;
-          }
-        },
-      },
-      "/history": {
-        target: "http://backend:8000",
-        changeOrigin: true,
-        secure: false,
-      },
-      "/models": {
-        target: "http://backend:8000",
-        changeOrigin: true,
-        secure: false,
-      },
-      "/health": {
-        target: "http://backend:8000",
-        changeOrigin: true,
-        secure: false,
-      },
-      "/pull": {
-        target: "http://backend:8000",
-        changeOrigin: true,
-        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
       // backend telemetry endpoints
       // rewrite API-prefixed telemetry endpoints to avoid colliding with
@@ -114,6 +91,18 @@ export default defineConfig({
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
-    }
+      "/api/history": {
+        target: "http://backend:8000",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      "/api/history/conversation": {
+        target: "http://backend:8000",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
   },
 });
